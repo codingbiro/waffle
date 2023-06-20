@@ -1,3 +1,6 @@
+# Custom
+target/*.*
+
 # Logs
 logs
 *.log
