@@ -1,34 +1,37 @@
-const { Web3 } = require('web3');
-const fs = require('fs');
+const { trace, log } = require("console");
+require('dotenv').config()
+const { Web3Storage, getFilesFromPath } = require("web3.storage");
 
-async function testWeb3() {
+async function handleUpload(filepath) {
     try {
-        const web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:7545'));
-        const response = Number.parseInt(await web3.eth.getBlockNumber());
-        console.trace(response.toString());
+        const client = new Web3Storage({ token: process.env.TOKEN });
+        
+        // Pack files into a CAR and send to web3.storage
+        const carFiles = await getFilesFromPath(filepath);
+        const rootCid = await client.put(carFiles);
+        log('CID', rootCid);
+
+        // Get info on the Filecoin deals that the CID is stored in
+        const info = await client.status(rootCid);
+        log('info', info);
+
+        // Fetch and verify files from web3.storage
+        const res = await client.get(rootCid);
+        const [{ cid, name, size }] = await res.files();
+        log('retrieved file', { cid, name, size });
     } catch (err) {
         console.error(err);
     }
 }
 
-// const { createHelia } = require('helia');
-async function heliaHelper() {
-    // const helia = await createHelia();
-}
-
 // Upload data to IPFS
-function uploadData(filename) {
-    if (!filename) {
-        throw new Error('Filename is required!');
+async function uploadData(filepath) {
+    if (!filepath) {
+        throw new Error('Filepath is required!');
     }
-    fs.readFile(filename, 'utf8', function (err, data) {
-        if (err) {
-            throw err;
-        }
-        // TODO: handle upload
-        console.trace('Succesfully uploaded', data);
-        process.exitCode = 1;
-    });
+    await handleUpload(filepath);
+    trace('Succesfully uploaded', filepath);
+    process.exitCode = 1;
 }
 
 // Handle incoming operation

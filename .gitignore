@@ -1,5 +1,8 @@
 # Custom
 target/*.*
+upload.zip
+upload.txt
+.DS_Store
 
 # Logs
 logs

@@ -11,7 +11,16 @@ const abi = require(abiPathJoin);
 const web3 = new Web3(new Web3.providers.HttpProvider(config.networkAddress));
 web3.eth.Contract.handleRevert = true;
 
-async function interact() {
+async function testWeb3() {
+    try {
+        console.trace(Number.parseInt(await web3.eth.getBlockNumber()).toString());
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function test() {
+    testWeb3();
     const providersAccounts = await web3.eth.getAccounts();
 
     try {
@@ -50,4 +59,4 @@ async function interact() {
     }
 }
 
-interact();
+test();

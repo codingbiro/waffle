@@ -6,12 +6,14 @@
   "author": "codingbiro <hello@birovince.com>",
   "license": "MIT",
   "dependencies": {
-    "helia": "1.3.2",
+    "dotenv": "16.3.1",
     "solc": "0.8.18",
-    "web3": "4.0.1"
+    "web3": "4.0.1",
+    "web3.storage": "4.5.4"
   },
   "scripts": {
     "contract:deploy": "node compile.js && node deploy.js",
-    "contract:test": "node test.js"
+    "contract:test": "node test.js",
+    "upload:test": "node main.js upload upload.zip"
   }
 }
