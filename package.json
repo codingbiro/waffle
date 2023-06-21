@@ -11,6 +11,7 @@
     "web3": "4.0.1"
   },
   "scripts": {
-    "contract:deploy": "node compile.js && node deploy.js"
+    "contract:deploy": "node compile.js && node deploy.js",
+    "contract:test": "node test.js"
   }
 }

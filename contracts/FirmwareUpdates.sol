@@ -18,7 +18,6 @@ contract FirmwareUpdates
         uint64 id; // id of the update
         string version; // version of the firmware
         address uploader;
-        string downloadUrl; // url of the firmware
         string hash; // hash of the firmware
         bool enabled; // whether the firmware is enabled
         bool latest; // whether the firmware is the latest
@@ -27,7 +26,6 @@ contract FirmwareUpdates
     struct UpdateInput
     {
         string version; // version of the firmware
-        string downloadUrl; // url of the firmware
         string hash; // hash of the firmware
         bool enabled; // whether the firmware is enabled
         bool latest; // whether the firmware is the latest
@@ -47,7 +45,6 @@ contract FirmwareUpdates
                 id: uint64(firmwareUpdates.length),
                 version: "test",
                 uploader: msg.sender,
-                downloadUrl: "example.com",
                 hash: "hashish",
                 enabled: true,
                 latest: true
@@ -198,7 +195,6 @@ contract FirmwareUpdates
                 id: uint64(firmwareUpdates.length),
                 version: update.version,
                 uploader: msg.sender,
-                downloadUrl: update.downloadUrl,
                 hash: update.hash,
                 enabled: update.enabled,
                 latest: update.latest
