@@ -31,7 +31,7 @@ async function uploadData(filepath) {
     }
     await handleUpload(filepath);
     trace('Succesfully uploaded', filepath);
-    process.exitCode = 1;
+    process.exitCode = 0;
 }
 
 // Handle incoming operation
