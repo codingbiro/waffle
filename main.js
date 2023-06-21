@@ -1,5 +1,5 @@
-const fs = require('fs');
 const { Web3 } = require('web3');
+const fs = require('fs');
 
 async function testWeb3() {
     try {
