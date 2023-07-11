@@ -1,10 +1,9 @@
-import config from '../../../config/index';
-
 /** @type {import('./$types').PageServerLoad} */
-export async function load() {
+export async function load({ fetch }) {
 	try {
-		const response = await fetch(config.clientAddress + '/api');
+		const response = await fetch('/api');
 		const updates = (await response?.json()) || [];
+
 		return {
 			updates
 		};
