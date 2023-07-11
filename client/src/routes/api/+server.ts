@@ -102,6 +102,7 @@ export async function POST({ request }) {
 		};
 
 		await FirmwareUpdatesContract.methods.createFirmwareUpdate(input).send({
+			// TODO: Expected 0 arguments, but got 1.ts(2554) on input
 			from: defaultAccount,
 			gas: '1000000',
 			gasPrice: '10000000000'
