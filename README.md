@@ -8,3 +8,6 @@ A Secure Firmware Dispatch System for IoT Devices using Blockchain
 - `node compile.js`: compiles project
 
 - `node deploy.js`: deploys contract
+
+### Notes
+- Works with Node v `18`
