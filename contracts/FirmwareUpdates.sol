@@ -21,6 +21,7 @@ contract FirmwareUpdates
         string hash; // hash of the firmware
         bool enabled; // whether the firmware is enabled
         bool latest; // whether the firmware is the latest
+        uint256 timestamp; // time of the creation of the update
     }
     
     struct UpdateInput
@@ -43,11 +44,12 @@ contract FirmwareUpdates
         firmwareUpdates.push(Update(
             {
                 id: uint64(firmwareUpdates.length),
-                version: "test",
+                version: "0.0.0-test",
                 uploader: msg.sender,
-                hash: "hashish",
+                hash: "vrQWhFysPKY211X2Kyq3WZuhs",
                 enabled: true,
-                latest: true
+                latest: false,
+                timestamp: block.timestamp
             }
         ));
     }
@@ -197,7 +199,8 @@ contract FirmwareUpdates
                 uploader: msg.sender,
                 hash: update.hash,
                 enabled: update.enabled,
-                latest: update.latest
+                latest: update.latest,
+                timestamp: block.timestamp
             }
         ));
     }
