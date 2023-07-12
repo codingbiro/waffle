@@ -192,7 +192,7 @@ contract FirmwareUpdates
      */
     function createFirmwareUpdate(UpdateInput calldata update) public uniqueVersionGuard(update.version) updaterGuard()
     {
-        firmwareUpdates.push(Update(
+        Update memory input = Update(
             {
                 id: uint64(firmwareUpdates.length),
                 version: update.version,
@@ -202,6 +202,7 @@ contract FirmwareUpdates
                 latest: update.latest,
                 timestamp: block.timestamp
             }
-        ));
+        );
+        firmwareUpdates.push(input);
     }
 }

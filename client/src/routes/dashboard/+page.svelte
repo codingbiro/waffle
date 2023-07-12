@@ -5,7 +5,7 @@
 	export let data;
 
 	let loading = false;
-	let error = false;
+	let error = '';
 	let modal_visible = false;
 	let new_version = '';
 	let new_enabled = false;
@@ -21,9 +21,9 @@
 	}
 
 	async function create_update() {
-		error = false;
+		error = '';
 		if (!files || !files.length || !new_version) {
-			error = true;
+			error = 'validation';
 			return;
 		}
 		const input = new FormData();
@@ -33,15 +33,17 @@
 		input.append('latest', new_latest.toString());
 
 		loading = true;
-		const response = await fetch('/api', {
+		const { status } = await fetch('/api/updates', {
 			method: 'POST',
 			body: input
 		});
 		loading = false;
-		console.log(response);
-
-		modal_visible = false;
-		invalidateAll();
+		if (status !== 201) {
+			error = 'create';
+		} else {
+			modal_visible = false;
+			invalidateAll();
+		}
 	}
 </script>
 
@@ -84,8 +86,11 @@
 					<div class="loader" />
 				{/if}
 			</button>
-			{#if error}
+			{#if error === 'validation'}
 				<p style="color:red;">Input validation failed. Fill out all fields.</p>
+			{/if}
+			{#if error === 'create'}
+				<p style="color:red;">Failed to create upload. Try again later.</p>
 			{/if}
 		</div>
 	</div>

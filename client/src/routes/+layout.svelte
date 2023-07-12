@@ -7,8 +7,8 @@
 	<a href="/dashboard" class:active={$page.url.pathname === '/dashboard'}>
 		<span class="material-symbols-outlined">&#xe871</span> Dashboard
 	</a>
-	<a href="/settings" class:active={$page.url.pathname === '/settings'}>
-		<span class="material-symbols-outlined">&#xe8b8</span> Settings
+	<a href="/information" class:active={$page.url.pathname === '/information'}>
+		<span class="material-symbols-outlined">&#xe8b8</span> Information
 	</a>
 	<p class="bottom">v0.0.1</p>
 </nav>
@@ -23,7 +23,7 @@
 		top: 0;
 		left: 0;
 		bottom: 0;
-		width: 150px;
+		width: 160px;
 		z-index: 2;
 		background-color: #f1e66d;
 		background: linear-gradient(#f1e66d, #f5e535);
@@ -33,7 +33,7 @@
 		padding-top: 20px;
 	}
 	article {
-		margin-left: 150px;
+		margin-left: 160px;
 		padding: 20px;
 	}
 	a,
