@@ -9,7 +9,7 @@
 	let modal_visible = false;
 	let new_version = '';
 	let new_enabled = false;
-	let new_latest = false;
+	let new_stable = false;
 
 	/**
 	 * @type {FileList}
@@ -30,7 +30,7 @@
 		input.append('file', files[0]);
 		input.append('version', new_version);
 		input.append('enabled', new_enabled.toString());
-		input.append('latest', new_latest.toString());
+		input.append('stable', new_stable.toString());
 
 		loading = true;
 		const { status } = await fetch('/api/updates', {
@@ -67,9 +67,9 @@
 				</label>
 			</div>
 			<div>
-				<p>Tag as latest release</p>
+				<p>Tag as stable release</p>
 				<label class="switch">
-					<input type="checkbox" bind:checked={new_latest} />
+					<input type="checkbox" bind:checked={new_stable} />
 					<span class="slider" />
 				</label>
 			</div>
@@ -109,11 +109,11 @@
 		<th>Uploader</th>
 		<th>Hash</th>
 		<th>Enabled</th>
-		<th>Latest</th>
+		<th>Stable</th>
 		<th>Timestamp</th>
 	</tr>
 	{#if data?.updates?.length}
-		{#each data.updates as { id, version, uploader, hash, enabled, latest, timestamp }}
+		{#each data.updates as { id, version, uploader, hash, enabled, stable, timestamp }}
 			<tr>
 				<td>{id}</td>
 				<td>{version}</td>
@@ -127,7 +127,7 @@
 					{/if}
 				</td>
 				<td>
-					{#if latest}
+					{#if stable}
 						<span class="material-symbols-outlined">&#xe5ca</span>
 					{:else}
 						<span class="material-symbols-outlined">&#xe5cd</span>

@@ -41,7 +41,7 @@ async function test() {
             version: "0.0.1-beta",
             hash: "bAerseretERrfdin3gdfOOld",
             enabled: true,
-            latest: false,
+            stable: false,
         };
         const receipt = await FirmwareUpdatesContract.methods.createFirmwareUpdate(input).send({
             from: defaultAccount,

@@ -20,7 +20,7 @@ contract FirmwareUpdates
         address uploader;
         string hash; // hash of the firmware
         bool enabled; // whether the firmware is enabled
-        bool latest; // whether the firmware is the latest
+        bool stable; // whether the firmware is a stable release
         uint256 timestamp; // time of the creation of the update
     }
     
@@ -29,7 +29,7 @@ contract FirmwareUpdates
         string version; // version of the firmware
         string hash; // hash of the firmware
         bool enabled; // whether the firmware is enabled
-        bool latest; // whether the firmware is the latest
+        bool stable; // whether the firmware is a stable release
     }
 
     Update[] private firmwareUpdates;
@@ -48,7 +48,7 @@ contract FirmwareUpdates
                 uploader: msg.sender,
                 hash: "vrQWhFysPKY211X2Kyq3WZuhs",
                 enabled: true,
-                latest: false,
+                stable: false,
                 timestamp: block.timestamp
             }
         ));
@@ -199,7 +199,7 @@ contract FirmwareUpdates
                 uploader: msg.sender,
                 hash: update.hash,
                 enabled: update.enabled,
-                latest: update.latest,
+                stable: update.stable,
                 timestamp: block.timestamp
             }
         );

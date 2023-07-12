@@ -13,7 +13,7 @@ interface FirmwareUdpdate {
 	uploader: string;
 	hash: string;
 	enabled: boolean;
-	latest: boolean;
+	stable: boolean;
 	timestamp: number;
 }
 
@@ -32,7 +32,7 @@ function parseResponse(input?: Record<string, bigint | boolean | string>[]): Fir
 			typeof i.uploader === 'string' &&
 			typeof i.hash === 'string' &&
 			typeof i.enabled === 'boolean' &&
-			typeof i.latest === 'boolean' &&
+			typeof i.stable === 'boolean' &&
 			typeof i.timestamp === 'bigint'
 		) {
 			returnArray.push({
@@ -41,7 +41,7 @@ function parseResponse(input?: Record<string, bigint | boolean | string>[]): Fir
 				uploader: i.uploader,
 				hash: i.hash,
 				enabled: i.enabled,
-				latest: i.latest,
+				stable: i.stable,
 				timestamp: Number(i.timestamp)
 			});
 		}
@@ -83,7 +83,7 @@ export async function POST({ request }) {
 		const values = await request.formData();
 		const version = values.get('version') as string;
 		const enabled = values.get('enabled') === 'true';
-		const latest = values.get('latest') === 'true';
+		const stable = values.get('stable') === 'true';
 		const file = values.get('file') as File;
 
 		if (!version || !file) {
@@ -97,7 +97,7 @@ export async function POST({ request }) {
 		const input = {
 			version,
 			enabled,
-			latest,
+			stable,
 			hash
 		};
 
