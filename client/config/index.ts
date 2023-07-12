@@ -1,9 +1,9 @@
 import fs from 'fs';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-const __dirname = dirname(fileURLToPath(import.meta.url));
-import abi from './FirmwareUdpdatesAbi.json';
+import abi from './FirmwareUdpdatesAbi';
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const deployedAddress = fs.readFileSync(__dirname + '/DeployedContractAddress.bin', 'utf8');
 
 const contractName = 'FirmwareUpdates';
