@@ -1,7 +1,7 @@
-/** @type {import('./$types').PageServerLoad} */
+/** @type {import('./$types').PageLoad} */
 export async function load({ fetch }) {
 	try {
-		const response = await fetch('/api');
+		const response = await fetch('/api/updates');
 		const updates = (await response?.json()) || [];
 
 		return {
