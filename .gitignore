@@ -3,6 +3,11 @@ target/*.*
 upload.zip
 upload.txt
 .DS_Store
+client/build
+client/.svelte-kit
+client/package
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
 
 # Logs
 logs

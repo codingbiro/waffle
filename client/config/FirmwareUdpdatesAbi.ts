@@ -67,6 +67,56 @@ const abi = (
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "getAvailableFirmwareUpdates",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint64",
+						"name": "id",
+						"type": "uint64"
+					},
+					{
+						"internalType": "string",
+						"name": "version",
+						"type": "string"
+					},
+					{
+						"internalType": "address",
+						"name": "uploader",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "hash",
+						"type": "string"
+					},
+					{
+						"internalType": "bool",
+						"name": "enabled",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "stable",
+						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "timestamp",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct FirmwareUpdates.Update[]",
+				"name": "firmwareUpdates_",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "uint64",
@@ -165,7 +215,7 @@ const abi = (
 					}
 				],
 				"internalType": "struct FirmwareUpdates.Update[]",
-				"name": "firmwareUpdates_",
+				"name": "",
 				"type": "tuple[]"
 			}
 		],
