@@ -21,4 +21,4 @@ A Secure Firmware Dispatch System for IoT Devices using Blockchain - a MSC Thesi
 - For more information on how to run Svelte, read `./client/README.md`
 
 ### Notes
-- Use node version `18` for best compatibility
+- Use node version `18` for best compatibility [(GitHub Issue)](https://github.com/web3-storage/web3.storage/issues/2274)
