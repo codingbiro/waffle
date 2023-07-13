@@ -156,10 +156,18 @@ contract FirmwareUpdates
     /** 
      * @dev Returns available firmware updates
      */
-    function getFirmwareUpdates() public view
+    function getAvailableFirmwareUpdates() public view
         returns (Update[] memory firmwareUpdates_)
     {
-        firmwareUpdates_ = new Update[](firmwareUpdates.length);
+        uint availableCounter = 0;
+        for (uint p = 0; p < firmwareUpdates.length; p++)
+        {
+            if (firmwareUpdates[p].enabled)
+            {
+                availableCounter = availableCounter + 1;
+            }
+        }
+        firmwareUpdates_ = new Update[](availableCounter);
         uint counter = 0;
         for (uint p = 0; p < firmwareUpdates.length; p++)
         {
@@ -169,6 +177,15 @@ contract FirmwareUpdates
                 counter = counter + 1;
             }
         }
+    }
+
+    /** 
+     * @dev Returns all firmware updates (for updaters only)
+     */
+    function getFirmwareUpdates() public view updaterGuard()
+        returns (Update[] memory)
+    {
+        return firmwareUpdates;
     }
 
     /** 
