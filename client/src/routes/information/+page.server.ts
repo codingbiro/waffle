@@ -9,8 +9,8 @@ export async function load({ fetch }) {
 		}
 
 		return {
-            info: json,
-        };
+			info: json
+		};
 	} catch (e) {
 		return {};
 	}

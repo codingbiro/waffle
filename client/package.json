@@ -29,11 +29,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"dotenv": "^16.3.1",
-		"web3": "4.0.2",
-		"web3.storage": "^4.5.4"
-	},
-	"resolutions": {
-		"ethereum-cryptography": "2.0.0"
+		"dotenv": "16.3.1",
+		"web3": "4.0.3",
+		"web3.storage": "4.5.4"
 	}
 }

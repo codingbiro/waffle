@@ -16,6 +16,7 @@
     "contract:test": "node test.js",
     "upload:test": "node main.js upload upload.zip",
     "client:init": "cp target/DeployedContractAddress.bin client/config && echo 'const abi = (' > ./client/config/FirmwareUdpdatesAbi.ts && cat ./target/FirmwareUdpdatesAbi.json >> ./client/config/FirmwareUdpdatesAbi.ts && echo ') as const; export default abi;' >> ./client/config/FirmwareUdpdatesAbi.ts",
+    "client:start": "cd ./client && yarn dev",
     "solhint": "solhint 'contracts/*.sol'"
   }
 }
