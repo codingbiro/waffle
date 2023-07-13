@@ -38,7 +38,6 @@ async function deploy() {
         const tx = await firmwareUpdatesContract.send({
             from: defaultAccount,
             gas,
-            gasPrice: 10000000000,
         });
 
         // Write the Contract address to a new file
