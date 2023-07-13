@@ -1,6 +1,6 @@
 import { Web3 } from 'web3';
 import config from '../../../../config/index';
-import { error, json } from '@sveltejs/kit';
+import { error, json, type RequestHandler } from '@sveltejs/kit';
 import { Web3Storage } from 'web3.storage';
 import 'dotenv/config.js';
 
@@ -53,7 +53,6 @@ function parseResponse(input?: Record<string, bigint | boolean | string>[]): Fir
 
 export async function GET() {
 	try {
-
 		// Get available updates again
 		const updates = parseResponse(
 			await FirmwareUpdatesContract.methods.getFirmwareUpdates().call({ from: defaultAccount })
@@ -78,7 +77,7 @@ async function handleUpload(file: File) {
 	return rootCid;
 }
 
-export async function POST({ request }) {
+export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const values = await request.formData();
 		const version = values.get('version') as string;

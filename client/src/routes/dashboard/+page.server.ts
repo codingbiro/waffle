@@ -1,5 +1,6 @@
-/** @type {import('./$types').PageLoad} */
-export async function load({ fetch }) {
+import type { ServerLoad } from "@sveltejs/kit";
+
+export const load: ServerLoad = async ({ fetch }) => {
 	try {
 		const response = await fetch('/api/updates');
 		const updates = (await response?.json()) || [];
