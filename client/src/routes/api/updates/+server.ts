@@ -6,6 +6,7 @@ import 'dotenv/config.js';
 
 const web3 = new Web3(new Web3.providers.HttpProvider(config.networkAddress));
 const [defaultAccount] = await web3.eth.getAccounts();
+const FirmwareUpdatesContract = new web3.eth.Contract(config.abi, config.deployedAddress);
 
 interface FirmwareUdpdate {
 	id: number;
@@ -52,7 +53,6 @@ function parseResponse(input?: Record<string, bigint | boolean | string>[]): Fir
 
 export async function GET() {
 	try {
-		const FirmwareUpdatesContract = new web3.eth.Contract(config.abi, config.deployedAddress);
 
 		// Get available updates again
 		const updates = parseResponse(
@@ -92,8 +92,6 @@ export async function POST({ request }) {
 
 		const hash = await handleUpload(file);
 
-		const FirmwareUpdatesContract = new web3.eth.Contract(config.abi, config.deployedAddress);
-
 		const input = {
 			version,
 			enabled,
@@ -103,8 +101,7 @@ export async function POST({ request }) {
 
 		await FirmwareUpdatesContract.methods.createFirmwareUpdate(input).send({
 			from: defaultAccount,
-			gas: '1000000',
-			gasPrice: '10000000000'
+			gas: '1000000'
 		});
 
 		return json({ cid: hash }, { status: 201 });
