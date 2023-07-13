@@ -108,4 +108,4 @@ export const POST: RequestHandler = async ({ request }) => {
 		console.trace(e);
 		throw error(500, 'Could not create firmware update');
 	}
-}
+};
