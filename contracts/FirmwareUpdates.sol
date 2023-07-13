@@ -49,6 +49,7 @@ contract FirmwareUpdates
                 hash: "vrQWhFysPKY211X2Kyq3WZuhs",
                 enabled: true,
                 stable: false,
+                // solhint-disable-next-line not-rely-on-time
                 timestamp: block.timestamp
             }
         ));
@@ -200,6 +201,7 @@ contract FirmwareUpdates
                 hash: update.hash,
                 enabled: update.enabled,
                 stable: update.stable,
+                // solhint-disable-next-line not-rely-on-time
                 timestamp: block.timestamp
             }
         );
