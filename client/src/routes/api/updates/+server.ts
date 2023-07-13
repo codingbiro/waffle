@@ -56,7 +56,7 @@ export async function GET() {
 
 		// Get available updates again
 		const updates = parseResponse(
-			await FirmwareUpdatesContract.methods.getFirmwareUpdates().call()
+			await FirmwareUpdatesContract.methods.getFirmwareUpdates().call({ from: defaultAccount })
 		);
 
 		return json(updates);
