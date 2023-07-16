@@ -217,7 +217,8 @@ contract FirmwareUpdates
                 uploader: msg.sender,
                 hash: update.hash,
                 enabled: update.enabled,
-                latest: update.latest,
+                stable: update.stable,
+                // solhint-disable-next-line not-rely-on-time
                 timestamp: block.timestamp
             }
         ));
