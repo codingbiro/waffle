@@ -210,18 +210,16 @@ contract FirmwareUpdates
      */
     function createFirmwareUpdate(UpdateInput calldata update) public uniqueVersionGuard(update.version) updaterGuard()
     {
-        Update memory input = Update(
+        firmwareUpdates.push(Update(
             {
                 id: uint64(firmwareUpdates.length),
                 version: update.version,
                 uploader: msg.sender,
                 hash: update.hash,
                 enabled: update.enabled,
-                stable: update.stable,
-                // solhint-disable-next-line not-rely-on-time
+                latest: update.latest,
                 timestamp: block.timestamp
             }
-        );
-        firmwareUpdates.push(input);
+        ));
     }
 }
