@@ -1,5 +1,5 @@
 # Custom
-target/*.*
+target/*
 upload.zip
 upload.txt
 .DS_Store
@@ -8,6 +8,10 @@ client/.svelte-kit
 client/package
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+artifacts
+cache
+client/config/*
+!client/config/index.ts
 
 # Logs
 logs
