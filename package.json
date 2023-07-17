@@ -13,8 +13,8 @@
   },
   "scripts": {
     "start": "yarn network:start & yarn config:init && yarn contract:deploy && yarn client:init && yarn client:start && fg",
-    "network:start": "npx hardhat node >> target/network.init",
-    "config:init": "awk 'NR==1 {print substr($0,64,4); exit}' target/network.init >> target/PORT",
+    "network:start": "npx hardhat node > target/network.init",
+    "config:init": "awk 'NR==1 {print substr($0,64,4); exit}' target/network.init > target/PORT",
     "contract:deploy": "node compile.js && node deploy.js && yarn run client:init",
     "contract:test": "node test.js",
     "upload:test": "node main.js upload upload.zip",
