@@ -1,7 +1,7 @@
 # Custom
 target/*
 upload.zip
-upload.txt
+*.txt
 .DS_Store
 client/build
 client/.svelte-kit
