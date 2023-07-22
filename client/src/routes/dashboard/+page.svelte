@@ -6,18 +6,29 @@
 
 	let loading = false;
 	let error = '';
-	let modal_visible = false;
+	let create_visible = false;
 	let new_version = '';
 	let new_enabled = false;
 	let new_stable = false;
+	/**
+	 * @type {{ id: number, hash: string, enabled: boolean } | null}
+	 */
+	let edit_item = null;
 
 	/**
 	 * @type {FileList}
 	 */
 	let files;
 
-	function showhide_modal(v = true) {
-		return () => (modal_visible = v);
+	function showhide_create(v = true) {
+		return () => (create_visible = v);
+	}
+
+	/**
+	 * @type {(v: { id: number, hash: string, enabled: boolean } | null) => () => void}
+	 */
+	function showhide_edit(v = null) {
+		return () => (edit_item = v);
 	}
 
 	async function create_update() {
@@ -41,7 +52,31 @@
 		if (status !== 201) {
 			error = 'create';
 		} else {
-			modal_visible = false;
+			create_visible = false;
+			invalidateAll();
+		}
+	}
+
+	async function edit_update() {
+		error = '';
+		if (!edit_item || Number.isNaN(edit_item.id)) {
+			error = 'validation';
+			return;
+		}
+		const input = new FormData();
+		input.append('id', edit_item.id.toString());
+		input.append('enabled', edit_item.enabled.toString());
+
+		loading = true;
+		const { status } = await fetch('/api/updates', {
+			method: 'PUT',
+			body: input
+		});
+		loading = false;
+		if (status !== 200) {
+			error = 'edit';
+		} else {
+			edit_item = null;
 			invalidateAll();
 		}
 	}
@@ -51,8 +86,8 @@
 	<title>Dashboard</title>
 </svelte:head>
 
-{#if modal_visible}
-	<div class="modal" on:click={showhide_modal(false)} role="presentation">
+{#if create_visible}
+	<div class="modal" on:click={showhide_create(false)} role="presentation">
 		<div on:click|stopPropagation role="presentation">
 			<h2>Publish a Firmware Update</h2>
 			<div>
@@ -77,7 +112,7 @@
 				<p>Upload the firmware</p>
 				<input bind:files id="firmware" name="firmware" type="file" />
 			</div>
-			<button class="close" on:click={showhide_modal(false)}>
+			<button class="close" on:click={showhide_create(false)}>
 				<span class="material-symbols-outlined">&#xe5cd</span>
 			</button>
 			<button class="publish" on:click={create_update}>
@@ -95,12 +130,46 @@
 		</div>
 	</div>
 {/if}
+{#if edit_item}
+	<div class="modal" on:click={showhide_edit(null)} role="presentation">
+		<div on:click|stopPropagation role="presentation">
+			<h2>Edit a Firmware Update</h2>
+			<div>
+				<p>id</p>
+				<input class="string" value={edit_item.id} disabled />
+			</div>
+			<div>
+				<p>hash</p>
+				<input class="string" value={edit_item.hash} disabled />
+			</div>
+			<div>
+				<p>Set as enabled</p>
+				<label class="switch">
+					<input type="checkbox" bind:checked={edit_item.enabled} />
+					<span class="slider" />
+				</label>
+			</div>
+			<button class="publish" on:click={edit_update}>
+				Save changes <span class="material-symbols-outlined">&#xe255</span>
+				{#if loading}
+					<div class="loader" />
+				{/if}
+			</button>
+			{#if error === 'validation'}
+				<p style="color:red;">Input validation failed. Fill out all fields.</p>
+			{/if}
+			{#if error === 'edit'}
+				<p style="color:red;">Failed to edit upload. Try again later.</p>
+			{/if}
+		</div>
+	</div>
+{/if}
 <h1>Dashboard</h1>
 <div class="top-section">
 	<p>Total count of updates: {data?.updates?.length || 0}</p>
-	<button class="create" on:click={showhide_modal()}
-		>Create Update <span class="material-symbols-outlined">&#xe2c3</span></button
-	>
+	<button class="create" on:click={showhide_create()}>
+		Create Update <span class="material-symbols-outlined">&#xe2c3</span>
+	</button>
 </div>
 <table>
 	<tr>
@@ -114,7 +183,7 @@
 	</tr>
 	{#if data?.updates?.length}
 		{#each data.updates as { id, version, uploader, hash, enabled, stable, timestamp }}
-			<tr>
+			<tr on:click={showhide_edit({ id, hash, enabled })}>
 				<td>{id}</td>
 				<td>{version}</td>
 				<td>{uploader}</td>

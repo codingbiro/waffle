@@ -109,3 +109,25 @@ export const POST: RequestHandler = async ({ request }) => {
 		throw error(500, 'Could not create firmware update');
 	}
 };
+
+export const PUT: RequestHandler = async ({ request }) => {
+	try {
+		const values = await request.formData();
+		const id = values.get('id') as string;
+		const enabled = values.get('enabled') === 'true';
+
+		if (!id) {
+			throw new Error('Invalid input');
+		}
+
+		await FirmwareUpdatesContract.methods.editFirmwareUpdate(id, enabled).send({
+			from: defaultAccount,
+			gas: '1000000'
+		});
+
+		return json({ id }, { status: 200 });
+	} catch (e) {
+		console.trace(e);
+		throw error(500, 'Could not create firmware update');
+	}
+};
