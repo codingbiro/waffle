@@ -12,7 +12,7 @@
     "web3.storage": "4.5.4"
   },
   "scripts": {
-    "start": "yarn network:start & yarn config:init && yarn contract:deploy && yarn client:init && yarn client:start && fg",
+    "start": "yarn network:start & sleep 5 && yarn config:init && yarn contract:deploy && yarn client:init && yarn client:start && fg",
     "network:start": "npx hardhat node > target/network.init",
     "config:init": "awk 'NR==1 {print substr($0,64,4); exit}' target/network.init > target/PORT",
     "contract:deploy": "node compile.js && node deploy.js && yarn run client:init",
