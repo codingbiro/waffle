@@ -181,6 +181,7 @@ contract FirmwareUpdates
 
     /** 
      * @dev Returns all firmware updates (for updaters only)
+     * @return firmwareUpdates all firmware updates
      */
     function getFirmwareUpdates() public view updaterGuard()
         returns (Update[] memory)
@@ -191,6 +192,7 @@ contract FirmwareUpdates
     /** 
      * @dev Returns a firmware update
      * @param id of firmware update
+     * @return firmwareUpdate_ the requested firmware update
      */
     function getFirmwareUpdate(uint64 id) public view
         returns (Update memory firmwareUpdate_)
@@ -222,5 +224,24 @@ contract FirmwareUpdates
                 timestamp: block.timestamp
             }
         ));
+    }
+    
+    /** 
+     * @dev Edits a firmware update's enabled status
+     * @param id of firmware update
+     * @param enabled whether updates is enabled
+     * @return firmwareUpdate_ the edited firmware update
+     */
+    function editFirmwareUpdate(uint64 id, bool enabled) public updaterGuard()
+        returns (Update memory firmwareUpdate_)
+    {
+        for (uint p = 0; p < firmwareUpdates.length; p++)
+        {
+            if (firmwareUpdates[p].id == id)
+            {
+                firmwareUpdates[p].enabled = enabled;
+                return firmwareUpdates[p];
+            }
+        }
     }
 }

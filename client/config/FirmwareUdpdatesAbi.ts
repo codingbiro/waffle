@@ -1,251 +1,312 @@
-const abi = (
-[
+const abi = [
 	{
-		"inputs": [],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
+		inputs: [],
+		stateMutability: 'nonpayable',
+		type: 'constructor'
 	},
 	{
-		"anonymous": false,
-		"inputs": [
+		anonymous: false,
+		inputs: [
 			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "info",
-				"type": "string"
+				indexed: false,
+				internalType: 'string',
+				name: 'info',
+				type: 'string'
 			}
 		],
-		"name": "Debug",
-		"type": "event"
+		name: 'Debug',
+		type: 'event'
 	},
 	{
-		"inputs": [
+		inputs: [
 			{
-				"internalType": "address",
-				"name": "updater",
-				"type": "address"
+				internalType: 'address',
+				name: 'updater',
+				type: 'address'
 			}
 		],
-		"name": "addUpdater",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
+		name: 'addUpdater',
+		outputs: [],
+		stateMutability: 'nonpayable',
+		type: 'function'
 	},
 	{
-		"inputs": [
+		inputs: [
 			{
-				"components": [
+				components: [
 					{
-						"internalType": "string",
-						"name": "version",
-						"type": "string"
+						internalType: 'string',
+						name: 'version',
+						type: 'string'
 					},
 					{
-						"internalType": "string",
-						"name": "hash",
-						"type": "string"
+						internalType: 'string',
+						name: 'hash',
+						type: 'string'
 					},
 					{
-						"internalType": "bool",
-						"name": "enabled",
-						"type": "bool"
+						internalType: 'bool',
+						name: 'enabled',
+						type: 'bool'
 					},
 					{
-						"internalType": "bool",
-						"name": "stable",
-						"type": "bool"
+						internalType: 'bool',
+						name: 'stable',
+						type: 'bool'
 					}
 				],
-				"internalType": "struct FirmwareUpdates.UpdateInput",
-				"name": "update",
-				"type": "tuple"
+				internalType: 'struct FirmwareUpdates.UpdateInput',
+				name: 'update',
+				type: 'tuple'
 			}
 		],
-		"name": "createFirmwareUpdate",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
+		name: 'createFirmwareUpdate',
+		outputs: [],
+		stateMutability: 'nonpayable',
+		type: 'function'
 	},
 	{
-		"inputs": [],
-		"name": "getAvailableFirmwareUpdates",
-		"outputs": [
+		inputs: [
 			{
-				"components": [
+				internalType: 'uint64',
+				name: 'id',
+				type: 'uint64'
+			},
+			{
+				internalType: 'bool',
+				name: 'enabled',
+				type: 'bool'
+			}
+		],
+		name: 'editFirmwareUpdate',
+		outputs: [
+			{
+				components: [
 					{
-						"internalType": "uint64",
-						"name": "id",
-						"type": "uint64"
+						internalType: 'uint64',
+						name: 'id',
+						type: 'uint64'
 					},
 					{
-						"internalType": "string",
-						"name": "version",
-						"type": "string"
+						internalType: 'string',
+						name: 'version',
+						type: 'string'
 					},
 					{
-						"internalType": "address",
-						"name": "uploader",
-						"type": "address"
+						internalType: 'address',
+						name: 'uploader',
+						type: 'address'
 					},
 					{
-						"internalType": "string",
-						"name": "hash",
-						"type": "string"
+						internalType: 'string',
+						name: 'hash',
+						type: 'string'
 					},
 					{
-						"internalType": "bool",
-						"name": "enabled",
-						"type": "bool"
+						internalType: 'bool',
+						name: 'enabled',
+						type: 'bool'
 					},
 					{
-						"internalType": "bool",
-						"name": "stable",
-						"type": "bool"
+						internalType: 'bool',
+						name: 'stable',
+						type: 'bool'
 					},
 					{
-						"internalType": "uint256",
-						"name": "timestamp",
-						"type": "uint256"
+						internalType: 'uint256',
+						name: 'timestamp',
+						type: 'uint256'
 					}
 				],
-				"internalType": "struct FirmwareUpdates.Update[]",
-				"name": "firmwareUpdates_",
-				"type": "tuple[]"
+				internalType: 'struct FirmwareUpdates.Update',
+				name: 'firmwareUpdate_',
+				type: 'tuple'
 			}
 		],
-		"stateMutability": "view",
-		"type": "function"
+		stateMutability: 'nonpayable',
+		type: 'function'
 	},
 	{
-		"inputs": [
+		inputs: [],
+		name: 'getAvailableFirmwareUpdates',
+		outputs: [
 			{
-				"internalType": "uint64",
-				"name": "id",
-				"type": "uint64"
-			}
-		],
-		"name": "getFirmwareUpdate",
-		"outputs": [
-			{
-				"components": [
+				components: [
 					{
-						"internalType": "uint64",
-						"name": "id",
-						"type": "uint64"
+						internalType: 'uint64',
+						name: 'id',
+						type: 'uint64'
 					},
 					{
-						"internalType": "string",
-						"name": "version",
-						"type": "string"
+						internalType: 'string',
+						name: 'version',
+						type: 'string'
 					},
 					{
-						"internalType": "address",
-						"name": "uploader",
-						"type": "address"
+						internalType: 'address',
+						name: 'uploader',
+						type: 'address'
 					},
 					{
-						"internalType": "string",
-						"name": "hash",
-						"type": "string"
+						internalType: 'string',
+						name: 'hash',
+						type: 'string'
 					},
 					{
-						"internalType": "bool",
-						"name": "enabled",
-						"type": "bool"
+						internalType: 'bool',
+						name: 'enabled',
+						type: 'bool'
 					},
 					{
-						"internalType": "bool",
-						"name": "stable",
-						"type": "bool"
+						internalType: 'bool',
+						name: 'stable',
+						type: 'bool'
 					},
 					{
-						"internalType": "uint256",
-						"name": "timestamp",
-						"type": "uint256"
+						internalType: 'uint256',
+						name: 'timestamp',
+						type: 'uint256'
 					}
 				],
-				"internalType": "struct FirmwareUpdates.Update",
-				"name": "firmwareUpdate_",
-				"type": "tuple"
+				internalType: 'struct FirmwareUpdates.Update[]',
+				name: 'firmwareUpdates_',
+				type: 'tuple[]'
 			}
 		],
-		"stateMutability": "view",
-		"type": "function"
+		stateMutability: 'view',
+		type: 'function'
 	},
 	{
-		"inputs": [],
-		"name": "getFirmwareUpdates",
-		"outputs": [
+		inputs: [
 			{
-				"components": [
+				internalType: 'uint64',
+				name: 'id',
+				type: 'uint64'
+			}
+		],
+		name: 'getFirmwareUpdate',
+		outputs: [
+			{
+				components: [
 					{
-						"internalType": "uint64",
-						"name": "id",
-						"type": "uint64"
+						internalType: 'uint64',
+						name: 'id',
+						type: 'uint64'
 					},
 					{
-						"internalType": "string",
-						"name": "version",
-						"type": "string"
+						internalType: 'string',
+						name: 'version',
+						type: 'string'
 					},
 					{
-						"internalType": "address",
-						"name": "uploader",
-						"type": "address"
+						internalType: 'address',
+						name: 'uploader',
+						type: 'address'
 					},
 					{
-						"internalType": "string",
-						"name": "hash",
-						"type": "string"
+						internalType: 'string',
+						name: 'hash',
+						type: 'string'
 					},
 					{
-						"internalType": "bool",
-						"name": "enabled",
-						"type": "bool"
+						internalType: 'bool',
+						name: 'enabled',
+						type: 'bool'
 					},
 					{
-						"internalType": "bool",
-						"name": "stable",
-						"type": "bool"
+						internalType: 'bool',
+						name: 'stable',
+						type: 'bool'
 					},
 					{
-						"internalType": "uint256",
-						"name": "timestamp",
-						"type": "uint256"
+						internalType: 'uint256',
+						name: 'timestamp',
+						type: 'uint256'
 					}
 				],
-				"internalType": "struct FirmwareUpdates.Update[]",
-				"name": "",
-				"type": "tuple[]"
+				internalType: 'struct FirmwareUpdates.Update',
+				name: 'firmwareUpdate_',
+				type: 'tuple'
 			}
 		],
-		"stateMutability": "view",
-		"type": "function"
+		stateMutability: 'view',
+		type: 'function'
 	},
 	{
-		"inputs": [
+		inputs: [],
+		name: 'getFirmwareUpdates',
+		outputs: [
 			{
-				"internalType": "address",
-				"name": "updater",
-				"type": "address"
+				components: [
+					{
+						internalType: 'uint64',
+						name: 'id',
+						type: 'uint64'
+					},
+					{
+						internalType: 'string',
+						name: 'version',
+						type: 'string'
+					},
+					{
+						internalType: 'address',
+						name: 'uploader',
+						type: 'address'
+					},
+					{
+						internalType: 'string',
+						name: 'hash',
+						type: 'string'
+					},
+					{
+						internalType: 'bool',
+						name: 'enabled',
+						type: 'bool'
+					},
+					{
+						internalType: 'bool',
+						name: 'stable',
+						type: 'bool'
+					},
+					{
+						internalType: 'uint256',
+						name: 'timestamp',
+						type: 'uint256'
+					}
+				],
+				internalType: 'struct FirmwareUpdates.Update[]',
+				name: '',
+				type: 'tuple[]'
 			}
 		],
-		"name": "removeUpdater",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
+		stateMutability: 'view',
+		type: 'function'
 	},
 	{
-		"inputs": [
+		inputs: [
 			{
-				"internalType": "address",
-				"name": "recipient",
-				"type": "address"
+				internalType: 'address',
+				name: 'updater',
+				type: 'address'
 			}
 		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
+		name: 'removeUpdater',
+		outputs: [],
+		stateMutability: 'nonpayable',
+		type: 'function'
+	},
+	{
+		inputs: [
+			{
+				internalType: 'address',
+				name: 'recipient',
+				type: 'address'
+			}
+		],
+		name: 'transferOwnership',
+		outputs: [],
+		stateMutability: 'nonpayable',
+		type: 'function'
 	}
-]) as const; export default abi;
+] as const;
+export default abi;
