@@ -1,7 +1,7 @@
 # Waffle
 A Secure Firmware Dispatch System for IoT Devices using Blockchain - a MSC Thesis project by Vince Biro at the Technical University of Denmark.
 ## Project information
-- Requires Node v18 with npx and yarn. Make sure you run `yarn` to install dependencies/
+- Requires Node v18 with npx and yarn. Make sure you run `yarn` to install dependencies in the root folder and in `./client`
 
 - To start an Ethereum development network with Hardhat, run `yarn network:start`
 ⚠️ If you use your own network, make sure the configuration files (`config.js` and `client/config/*`) are set up accordingly.
