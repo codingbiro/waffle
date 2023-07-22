@@ -41,18 +41,6 @@ contract FirmwareUpdates
     {
         owner = msg.sender;
         updaters.push(msg.sender);
-        firmwareUpdates.push(Update(
-            {
-                id: uint64(firmwareUpdates.length),
-                version: "0.0.0-test",
-                uploader: msg.sender,
-                hash: "vrQWhFysPKY211X2Kyq3WZuhs",
-                enabled: true,
-                stable: false,
-                // solhint-disable-next-line not-rely-on-time
-                timestamp: block.timestamp
-            }
-        ));
     }
 
     // Modifier to check if caller is owner
