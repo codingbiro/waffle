@@ -46,11 +46,11 @@
 		font-weight: 300;
 		display: flex;
 		align-items: center;
-		& > span {
-			margin-right: 5px;
-		}
 		margin-left: 20px;
 		margin-bottom: 20px;
+	}
+	a > span {
+		margin-right: 5px;
 	}
 	a:hover {
 		opacity: 0.6;
