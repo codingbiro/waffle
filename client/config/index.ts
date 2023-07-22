@@ -1,11 +1,8 @@
 import fs from 'fs';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
 import abi from './FirmwareUdpdatesAbi';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const deployedAddress = fs.readFileSync(__dirname + '/DeployedContractAddress.bin', 'utf8');
-const PORT = fs.readFileSync(__dirname + '/PORT', 'utf8') || 8545;
+const deployedAddress = fs.readFileSync('./config/DeployedContractAddress.bin', 'utf8');
+const PORT = fs.readFileSync('./config/PORT', 'utf8') || 8545;
 
 const contractName = 'FirmwareUpdates';
 const networkAddress = 'http://127.0.0.1:' + PORT;
