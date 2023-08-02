@@ -11,7 +11,7 @@
 	let new_enabled = false;
 	let new_stable = false;
 	/**
-	 * @type {{ id: number, hash: string, enabled: boolean } | null}
+	 * @type {{ id: number, hash: string, enabled: boolean, url: string } | null}
 	 */
 	let edit_item = null;
 
@@ -25,10 +25,19 @@
 	}
 
 	/**
-	 * @type {(v: { id: number, hash: string, enabled: boolean } | null) => () => void}
+	 * @type {(v: { id: number, hash: string, enabled: boolean } | null) => Promise<void>}
 	 */
-	function showhide_edit(v = null) {
-		return () => (edit_item = v);
+	async function showhide_edit(v = null) {
+		loading = true;
+		let url = "";
+		if (v) {
+			const info = await fetch('/api/updates/' + v.id);
+			url = (await info.json()).fileUrl ?? "";
+			edit_item = { ...v, url };
+		} else {
+			edit_item = null;
+		}
+		loading = false;
 	}
 
 	async function create_update() {
@@ -64,11 +73,10 @@
 			return;
 		}
 		const input = new FormData();
-		input.append('id', edit_item.id.toString());
 		input.append('enabled', edit_item.enabled.toString());
 
 		loading = true;
-		const { status } = await fetch('/api/updates', {
+		const { status } = await fetch('/api/updates/' + edit_item.id, {
 			method: 'PUT',
 			body: input
 		});
@@ -131,7 +139,7 @@
 	</div>
 {/if}
 {#if edit_item}
-	<div class="modal" on:click={showhide_edit(null)} role="presentation">
+	<div class="modal" on:click={() => void showhide_edit(null)} role="presentation">
 		<div on:click|stopPropagation role="presentation">
 			<h2>Edit a Firmware Update</h2>
 			<div>
@@ -149,12 +157,22 @@
 					<span class="slider" />
 				</label>
 			</div>
-			<button class="publish" on:click={edit_update}>
-				Save changes <span class="material-symbols-outlined">&#xe255</span>
-				{#if loading}
-					<div class="loader" />
-				{/if}
-			</button>
+			<div>
+				<button class="publish" style="margin:auto auto 0 0">
+					<a href={edit_item.url} target="_blank" download>
+						Download <span class="material-symbols-outlined">&#xf090</span>
+					</a>
+					{#if loading}
+						<div class="loader" />
+					{/if}
+				</button>
+				<button class="publish" on:click={edit_update}>
+					Save changes <span class="material-symbols-outlined">&#xe255</span>
+					{#if loading}
+						<div class="loader" />
+					{/if}
+				</button>
+			</div>
 			{#if error === 'validation'}
 				<p style="color:red;">Input validation failed. Fill out all fields.</p>
 			{/if}
@@ -183,7 +201,7 @@
 	</tr>
 	{#if data?.updates?.length}
 		{#each data.updates as { id, version, uploader, hash, enabled, stable, timestamp }}
-			<tr on:click={showhide_edit({ id, hash, enabled })}>
+			<tr on:click={() => void showhide_edit({ id, hash, enabled })}>
 				<td>{id}</td>
 				<td>{version}</td>
 				<td>{uploader}</td>
@@ -212,8 +230,17 @@
 		</tr>
 	{/if}
 </table>
-
+{#if loading}
+	<div id="abs-loader">
+		<div class="loader" />
+	</div>
+{/if}
 <style>
+	#abs-loader {
+		position: absolute;
+		right: 20px;
+		bottom: 20px;
+	}
 	input.string {
 		border: none;
 		height: 30px;
@@ -300,6 +327,13 @@
 		margin-left: auto;
 		margin-top: 20px;
 	}
+	button > a, button > a:hover, button > a:visited, button > a:active {
+		color: white;
+		text-decoration: none;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
 	h2 {
 		margin: 0;
 		font-weight: 300;
@@ -363,7 +397,7 @@
 		cursor: pointer;
 		border-radius: 5px;
 	}
-	button > span {
+	button > span, button > a > span {
 		margin-left: 10px;
 	}
 	button:hover {
@@ -402,6 +436,7 @@
 	}
 	tr:hover:not(:first-child) {
 		opacity: 0.5;
+		cursor: pointer;
 	}
 	div.file {
 		text-align: center;
