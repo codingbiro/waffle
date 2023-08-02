@@ -7,6 +7,10 @@ import 'dotenv/config.js';
 const web3 = new Web3(new Web3.providers.HttpProvider(config.networkAddress));
 const [defaultAccount] = await web3.eth.getAccounts();
 const FirmwareUpdatesContract = new web3.eth.Contract(config.abi, config.deployedAddress);
+if (!process.env.TOKEN) {
+	throw new Error('Missing TOKEN');
+}
+const client = new Web3Storage({ token: process.env.TOKEN });
 
 interface FirmwareUdpdate {
 	id: number;
@@ -66,11 +70,6 @@ export async function GET() {
 }
 
 async function handleUpload(file: File) {
-	if (!process.env.TOKEN) {
-		throw new Error('Missing TOKEN');
-	}
-	const client = new Web3Storage({ token: process.env.TOKEN });
-
 	// Upload file to Filecoin
 	const rootCid = await client.put([file]);
 
@@ -104,28 +103,6 @@ export const POST: RequestHandler = async ({ request }) => {
 		});
 
 		return json({ cid: hash }, { status: 201 });
-	} catch (e) {
-		console.trace(e);
-		throw error(500, 'Could not create firmware update');
-	}
-};
-
-export const PUT: RequestHandler = async ({ request }) => {
-	try {
-		const values = await request.formData();
-		const id = values.get('id') as string;
-		const enabled = values.get('enabled') === 'true';
-
-		if (!id) {
-			throw new Error('Invalid input');
-		}
-
-		await FirmwareUpdatesContract.methods.editFirmwareUpdate(id, enabled).send({
-			from: defaultAccount,
-			gas: '1000000'
-		});
-
-		return json({ id }, { status: 200 });
 	} catch (e) {
 		console.trace(e);
 		throw error(500, 'Could not create firmware update');
