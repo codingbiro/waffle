@@ -17,7 +17,7 @@
     "config:init": "awk 'NR==1 {print substr($0,64,4); exit}' target/network.init > target/PORT",
     "contract:deploy": "node compile.js && node deploy.js && yarn run client:init",
     "contract:test": "node test.js",
-    "upload:test": "node main.js upload upload.zip",
+    "upload:test": "node main.js upload satoshi.txt",
     "client:init": "cp target/PORT client/config && cp target/DeployedContractAddress.bin client/config && echo 'const abi = (' > ./client/config/FirmwareUdpdatesAbi.ts && cat ./target/FirmwareUdpdatesAbi.json >> ./client/config/FirmwareUdpdatesAbi.ts && echo ') as const; export default abi;' >> ./client/config/FirmwareUdpdatesAbi.ts",
     "client:start": "cd ./client && yarn dev",
     "solhint": "solhint 'contracts/*.sol'"
