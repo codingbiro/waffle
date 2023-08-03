@@ -1,7 +1,6 @@
 import { Web3 } from 'web3';
 import config from '../../../../../config/index';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
-import { Web3Storage } from 'web3.storage';
 import 'dotenv/config.js';
 
 const web3 = new Web3(new Web3.providers.HttpProvider(config.networkAddress));
@@ -11,8 +10,6 @@ const FirmwareUpdatesContract = new web3.eth.Contract(config.abi, config.deploye
 if (!process.env.TOKEN) {
 	throw new Error('Missing TOKEN');
 }
-
-const client = new Web3Storage({ token: process.env.TOKEN });
 
 interface FirmwareUdpdate {
 	id: number;
@@ -68,12 +65,9 @@ export async function GET({ params }) {
 			throw new Error('Invalid udpate');
 		}
 
-		const info = await client.get(update.hash);
-		const files = info ? await info.files() : [];
-		const fileName = files.length ? files[0].name ?? '' : '';
-		const fileUrl = `https://${update.hash}.ipfs.w3s.link/${encodeURIComponent(fileName)}`;
+		const fileUrl = `https://${update.hash}.ipfs.w3s.link/`;
 
-		return json({ ...update, fileName, fileUrl });
+		return json({ ...update, fileUrl });
 	} catch (e) {
 		console.log(e);
 		throw error(500, 'Could not get firmware update');

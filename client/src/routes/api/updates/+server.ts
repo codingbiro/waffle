@@ -1,7 +1,8 @@
 import { Web3 } from 'web3';
-import config from '../../../../config/index';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
 import { Web3Storage } from 'web3.storage';
+
+import config from '../../../../config/index';
 import 'dotenv/config.js';
 
 const web3 = new Web3(new Web3.providers.HttpProvider(config.networkAddress));
@@ -71,7 +72,7 @@ export async function GET() {
 
 async function handleUpload(file: File) {
 	// Upload file to Filecoin
-	const rootCid = await client.put([file]);
+	const rootCid = await client.put([file], { wrapWithDirectory: false });
 
 	return rootCid;
 }
