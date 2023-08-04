@@ -7,9 +7,10 @@
 	let loading = false;
 	let error = '';
 	let create_visible = false;
-	let new_version = '';
-	let new_enabled = false;
-	let new_stable = false;
+	/**
+	 * @type {{ version: string, enabled: boolean, stable: boolean }}
+	 */
+	let new_item = { version: '', enabled: false, stable: false };
 	/**
 	 * @type {{ id: number, hash: string, enabled: boolean, url: string } | null}
 	 */
@@ -42,15 +43,15 @@
 
 	async function create_update() {
 		error = '';
-		if (!files || !files.length || !new_version) {
+		if (!files || !files.length || !new_item.version) {
 			error = 'validation';
 			return;
 		}
 		const input = new FormData();
 		input.append('file', files[0]);
-		input.append('version', new_version);
-		input.append('enabled', new_enabled.toString());
-		input.append('stable', new_stable.toString());
+		input.append('version', new_item.version);
+		input.append('enabled', new_item.enabled.toString());
+		input.append('stable', new_item.stable.toString());
 
 		loading = true;
 		const { status } = await fetch('/api/updates', {
@@ -62,6 +63,7 @@
 			error = 'create';
 		} else {
 			create_visible = false;
+			new_item = { version: '', enabled: false, stable: false };
 			invalidateAll();
 		}
 	}
@@ -100,19 +102,19 @@
 			<h2>Publish a Firmware Update</h2>
 			<div>
 				<p>Version name</p>
-				<input class="string" bind:value={new_version} />
+				<input class="string" bind:value={new_item.version} />
 			</div>
 			<div>
 				<p>Set as enabled</p>
 				<label class="switch">
-					<input type="checkbox" bind:checked={new_enabled} />
+					<input type="checkbox" bind:checked={new_item.enabled} />
 					<span class="slider" />
 				</label>
 			</div>
 			<div>
 				<p>Tag as stable release</p>
 				<label class="switch">
-					<input type="checkbox" bind:checked={new_stable} />
+					<input type="checkbox" bind:checked={new_item.stable} />
 					<span class="slider" />
 				</label>
 			</div>
