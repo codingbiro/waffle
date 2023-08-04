@@ -1,6 +1,6 @@
 import { Web3 } from 'web3';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
-import { Web3Storage } from 'web3.storage';
+import { Web3Storage, type CIDString } from 'web3.storage';
 
 import config from '../../../../config/index';
 import 'dotenv/config.js';
@@ -71,10 +71,20 @@ export async function GET() {
 }
 
 async function handleUpload(file: File) {
-	// Upload file to Filecoin
-	const rootCid = await client.put([file], { wrapWithDirectory: false });
+	// Save local CID
+	let localCid = '';
+	// This gets triggered before the CAR is uploaded to the server
+	const onRootCidReady = (cid: CIDString) => (localCid = cid);
 
-	return rootCid;
+	// Upload file to Filecoin
+	const serverCid = await client.put([file], { wrapWithDirectory: false, onRootCidReady });
+
+	// Verify CID from server
+	if (localCid !== serverCid) {
+		throw new Error('CID mismatch');
+	}
+
+	return serverCid;
 }
 
 export const POST: RequestHandler = async ({ request }) => {
