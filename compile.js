@@ -1,7 +1,7 @@
 const solc = require('solc');
 const path = require('path');
 const fs = require('fs');
-const { trace } = require('console');
+const { info, trace } = require('console');
 
 const config = require('./config');
 
@@ -43,7 +43,7 @@ function run() {
         // Write the Contract ABI to a new file
         const abiPathJoin = path.join(__dirname, config.abiPath);
         fs.writeFileSync(abiPathJoin, JSON.stringify(abi, null, '\t'));
-        trace('CompilationSuccess');
+        info('CompilationSuccess');
     } catch (err) {
         trace(err);
     }

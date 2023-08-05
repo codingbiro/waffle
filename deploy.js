@@ -1,7 +1,7 @@
 const { Web3 } = require('web3');
 const fs = require('fs');
 const path = require('path');
-const { log, trace } = require('console');
+const { info, trace } = require('console');
 
 const config = require('./config');
 const abiPathJoin = path.join(__dirname, config.abiPath);
@@ -32,7 +32,7 @@ async function deploy() {
         const gas = await firmwareUpdatesContract.estimateGas({
             from: defaultAccount,
         });
-        log('estimateGas', gas, '| deployer account', defaultAccount);
+        info('estimateGas', gas, '| deployer account', defaultAccount);
 
         // Deploy the contract to the network
         const tx = await firmwareUpdatesContract.send({
@@ -43,7 +43,7 @@ async function deploy() {
         // Write the Contract address to a new file
         const deployedAddressPath = path.join(__dirname, config.deployedContractAddress);
         fs.writeFileSync(deployedAddressPath, tx.options.address);
-        trace('DeploymentSuccess');
+        info('DeploymentSuccess');
     } catch (err) {
         trace(err);
     }
