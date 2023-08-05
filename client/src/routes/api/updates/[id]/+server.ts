@@ -1,7 +1,8 @@
 import { Web3 } from 'web3';
-import config from '../../../../../config/index';
+import config from '$config';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
 import 'dotenv/config.js';
+import type { FirmwareUdpdate } from '$src/types/firmware';
 
 const web3 = new Web3(new Web3.providers.HttpProvider(config.networkAddress));
 const [defaultAccount] = await web3.eth.getAccounts();
@@ -9,16 +10,6 @@ const FirmwareUpdatesContract = new web3.eth.Contract(config.abi, config.deploye
 
 if (!process.env.TOKEN) {
 	throw new Error('Missing TOKEN');
-}
-
-interface FirmwareUdpdate {
-	id: number;
-	version: string;
-	uploader: string;
-	hash: string;
-	enabled: boolean;
-	stable: boolean;
-	timestamp: number;
 }
 
 function parseResponse(
@@ -33,6 +24,7 @@ function parseResponse(
 		typeof input.version === 'string' &&
 		typeof input.uploader === 'string' &&
 		typeof input.hash === 'string' &&
+		typeof input.name === 'string' &&
 		typeof input.enabled === 'boolean' &&
 		typeof input.stable === 'boolean' &&
 		typeof input.timestamp === 'bigint'
@@ -43,6 +35,7 @@ function parseResponse(
 					version: input.version,
 					uploader: input.uploader,
 					hash: input.hash,
+					name: input.name,
 					enabled: input.enabled,
 					stable: input.stable,
 					timestamp: Number(input.timestamp)
@@ -52,8 +45,7 @@ function parseResponse(
 
 	return undefined;
 }
-
-export async function GET({ params }) {
+export const GET: RequestHandler = async ({ params }) => {
 	try {
 		const id = params.id ?? -1;
 
@@ -72,25 +64,32 @@ export async function GET({ params }) {
 		console.log(e);
 		throw error(500, 'Could not get firmware update');
 	}
-}
+};
 
 export const PUT: RequestHandler = async ({ request, params }) => {
 	try {
 		const values = await request.formData();
 		const enabled = values.get('enabled') === 'true';
+		const name = typeof values.get('name') === 'string' ? (values.get('name') as string) : '';
 
-		if (!params.id) {
+		if (!params.id || !name) {
 			throw new Error('Invalid input');
 		}
 
-		await FirmwareUpdatesContract.methods.editFirmwareUpdate(params.id, enabled).send({
+		const input = {
+			id: params.id,
+			name,
+			enabled
+		};
+
+		await FirmwareUpdatesContract.methods.editFirmwareUpdate(input).send({
 			from: defaultAccount,
-			gas: '1000000'
+			gas: '10000000' // TODO!
 		});
 
 		return json({ id: params.id }, { status: 200 });
 	} catch (e) {
 		console.trace(e);
-		throw error(500, 'Could not create firmware update');
+		throw error(500, 'Could not edit firmware update');
 	}
 };

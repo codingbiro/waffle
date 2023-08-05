@@ -2,8 +2,9 @@ import { Web3 } from 'web3';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
 import { Web3Storage, type CIDString } from 'web3.storage';
 
-import config from '../../../../config/index';
+import config from '$config';
 import 'dotenv/config.js';
+import type { FirmwareUdpdate } from '$src/types/firmware';
 
 const web3 = new Web3(new Web3.providers.HttpProvider(config.networkAddress));
 const [defaultAccount] = await web3.eth.getAccounts();
@@ -12,16 +13,6 @@ if (!process.env.TOKEN) {
 	throw new Error('Missing TOKEN');
 }
 const client = new Web3Storage({ token: process.env.TOKEN });
-
-interface FirmwareUdpdate {
-	id: number;
-	version: string;
-	uploader: string;
-	hash: string;
-	enabled: boolean;
-	stable: boolean;
-	timestamp: number;
-}
 
 function parseResponse(input?: Record<string, bigint | boolean | string>[]): FirmwareUdpdate[] {
 	if (!input) {
@@ -37,6 +28,7 @@ function parseResponse(input?: Record<string, bigint | boolean | string>[]): Fir
 			typeof i.version === 'string' &&
 			typeof i.uploader === 'string' &&
 			typeof i.hash === 'string' &&
+			typeof i.name === 'string' &&
 			typeof i.enabled === 'boolean' &&
 			typeof i.stable === 'boolean' &&
 			typeof i.timestamp === 'bigint'
@@ -46,6 +38,7 @@ function parseResponse(input?: Record<string, bigint | boolean | string>[]): Fir
 				version: i.version,
 				uploader: i.uploader,
 				hash: i.hash,
+				name: i.name,
 				enabled: i.enabled,
 				stable: i.stable,
 				timestamp: Number(i.timestamp)
@@ -90,27 +83,30 @@ async function handleUpload(file: File) {
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const values = await request.formData();
-		const version = values.get('version') as string;
+		const version =
+			typeof values.get('version') === 'string' ? (values.get('version') as string) : '';
+		const name = typeof values.get('name') === 'string' ? (values.get('name') as string) : '';
 		const enabled = values.get('enabled') === 'true';
 		const stable = values.get('stable') === 'true';
-		const file = values.get('file') as File;
+		const file = typeof values.get('file') === 'object' ? (values.get('file') as File) : undefined;
 
-		if (!version || !file) {
+		if (!version || !file || !name) {
 			throw new Error('Invalid input');
 		}
 
-		const hash = await handleUpload(file);
+		const hash = await handleUpload(file as File);
 
 		const input = {
 			version,
 			enabled,
 			stable,
-			hash
+			hash,
+			name
 		};
 
 		await FirmwareUpdatesContract.methods.createFirmwareUpdate(input).send({
 			from: defaultAccount,
-			gas: '1000000'
+			gas: '1000000' // TODO!
 		});
 
 		return json({ cid: hash }, { status: 201 });

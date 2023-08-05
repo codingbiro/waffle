@@ -7,33 +7,27 @@
 	let loading = false;
 	let error = '';
 	let create_visible = false;
-	/**
-	 * @type {{ version: string, enabled: boolean, stable: boolean }}
-	 */
-	let new_item = { version: '', enabled: false, stable: false };
-	/**
-	 * @type {{ id: number, hash: string, enabled: boolean, url: string } | null}
-	 */
+	
+	/** @type {import('$src/types/firmware').NewFirmware} */
+	let new_item = { version: '', enabled: false, stable: false, name: '' };
+
+	/** @type {import('src/types/firmware').EditFirmware | null} */
 	let edit_item = null;
 
-	/**
-	 * @type {FileList}
-	 */
+	/** @type {FileList} */
 	let files;
 
 	function showhide_create(v = true) {
 		return () => (create_visible = v);
 	}
 
-	/**
-	 * @type {(v: { id: number, hash: string, enabled: boolean } | null) => Promise<void>}
-	 */
+	/** @type {import('src/types/firmware').ShowHideEditFn} */
 	async function showhide_edit(v = null) {
 		loading = true;
-		let url = "";
+		let url = '';
 		if (v) {
 			const info = await fetch('/api/updates/' + v.id);
-			url = (await info.json()).fileUrl ?? "";
+			url = (await info.json()).fileUrl ?? '';
 			edit_item = { ...v, url };
 		} else {
 			edit_item = null;
@@ -43,13 +37,14 @@
 
 	async function create_update() {
 		error = '';
-		if (!files || !files.length || !new_item.version) {
+		if (!files || !files.length || !new_item.version || !new_item.name) {
 			error = 'validation';
 			return;
 		}
 		const input = new FormData();
 		input.append('file', files[0]);
 		input.append('version', new_item.version);
+		input.append('name', new_item.name);
 		input.append('enabled', new_item.enabled.toString());
 		input.append('stable', new_item.stable.toString());
 
@@ -63,19 +58,20 @@
 			error = 'create';
 		} else {
 			create_visible = false;
-			new_item = { version: '', enabled: false, stable: false };
+			new_item = { version: '', enabled: false, stable: false, name: '' };
 			invalidateAll();
 		}
 	}
 
 	async function edit_update() {
 		error = '';
-		if (!edit_item || Number.isNaN(edit_item.id)) {
+		if (!edit_item || Number.isNaN(edit_item.id) || !edit_item.name) {
 			error = 'validation';
 			return;
 		}
 		const input = new FormData();
 		input.append('enabled', edit_item.enabled.toString());
+		input.append('name', edit_item.name);
 
 		loading = true;
 		const { status } = await fetch('/api/updates/' + edit_item.id, {
@@ -90,6 +86,25 @@
 			invalidateAll();
 		}
 	}
+
+	/** @type {(timestamp: number) => string} */
+	function displayTimestamp(timestamp) {
+  		// Date from timestamp which is converted to ms from s
+  		const date = new Date(timestamp * 1000);
+
+		const year = date.getFullYear();
+		const month = ("0" + (date.getMonth() + 1)).slice(-2); // Months are 0-based
+		const day = ("0" + date.getDate()).slice(-2);
+		const hours = ("0" + date.getHours()).slice(-2);
+		const minutes = ("0" + date.getMinutes()).slice(-2);
+		const seconds = ("0" + date.getSeconds()).slice(-2);
+
+		// Format the date and time
+		const formattedDate = `${day}-${month}-${year}`;
+		const formattedTime = `${hours}:${minutes}:${seconds}`;
+
+		return `${formattedDate} ${formattedTime}`;
+	}
 </script>
 
 <svelte:head>
@@ -100,6 +115,10 @@
 	<div class="modal" on:click={showhide_create(false)} role="presentation">
 		<div on:click|stopPropagation role="presentation">
 			<h2>Publish a Firmware Update</h2>
+			<div>
+				<p>Name of the firmware</p>
+				<input class="string" bind:value={new_item.name} />
+			</div>
 			<div>
 				<p>Version name</p>
 				<input class="string" bind:value={new_item.version} />
@@ -143,14 +162,22 @@
 {#if edit_item}
 	<div class="modal" on:click={() => void showhide_edit(null)} role="presentation">
 		<div on:click|stopPropagation role="presentation">
-			<h2>Edit a Firmware Update</h2>
+			<h2>Edit Firmware Update</h2>
 			<div>
 				<p>id</p>
 				<input class="string" value={edit_item.id} disabled />
 			</div>
 			<div>
+				<p>name</p>
+				<input class="string full" bind:value={edit_item.name} />
+			</div>
+			<div>
+				<p>uploader</p>
+				<input class="string full" value={edit_item.uploader} disabled />
+			</div>
+			<div>
 				<p>hash</p>
-				<input class="string" value={edit_item.hash} disabled />
+				<input class="string full" value={edit_item.hash} disabled />
 			</div>
 			<div>
 				<p>Set as enabled</p>
@@ -193,42 +220,44 @@
 </div>
 <table>
 	<tr>
-		<th>ID</th>
+		<th class="small" style="width: auto;">ID</th>
+		<th>Name</th>
 		<th>Version</th>
 		<th>Uploader</th>
 		<th>Hash</th>
-		<th>Enabled</th>
-		<th>Stable</th>
+		<th class="small">Enabled</th>
+		<th class="small">Stable</th>
 		<th>Timestamp</th>
 	</tr>
 	{#if data?.updates?.length}
-		{#each data.updates as { id, version, uploader, hash, enabled, stable, timestamp }}
-			<tr on:click={() => void showhide_edit({ id, hash, enabled })}>
+		{#each data.updates as { id, version, uploader, hash, enabled, stable, timestamp, name }}
+			<tr on:click={() => void showhide_edit({ id, hash, enabled, name, uploader })}>
 				<td>{id}</td>
+				<td>{name}</td>
 				<td>{version}</td>
 				<td>{uploader}</td>
 				<td>{hash}</td>
-				<td>
+				<td class="small">
 					{#if enabled}
 						<span class="material-symbols-outlined">&#xe5ca</span>
 					{:else}
 						<span class="material-symbols-outlined">&#xe5cd</span>
 					{/if}
 				</td>
-				<td>
+				<td class="small">
 					{#if stable}
 						<span class="material-symbols-outlined">&#xe5ca</span>
 					{:else}
 						<span class="material-symbols-outlined">&#xe5cd</span>
 					{/if}
 				</td>
-				<td>{timestamp}</td>
+				<td>{displayTimestamp(timestamp)}</td>
 			</tr>
 		{/each}
 	{/if}
 	{#if !data.updates?.length}
 		<tr>
-			<td colspan="7" class="c">No data</td>
+			<td colspan="8" class="c">No data</td>
 		</tr>
 	{/if}
 </table>
@@ -251,6 +280,13 @@
 		padding: 5px 15px;
 		font-size: 16px;
 		font-family: Roboto;
+	}
+	input.string.full {
+		width: 500px;
+	}
+	td.small, th.small {
+		width: 80px;
+		text-align: center;
 	}
 	.switch {
 		position: relative;
@@ -415,6 +451,9 @@
 		border: 1px solid #f1e66d;
 		text-align: left;
 		padding: 8px;
+		max-width: 100px;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 	td > span {
 		display: flex;

@@ -17,19 +17,28 @@ contract FirmwareUpdates
     {
         uint64 id; // id of the update
         string version; // version of the firmware
-        address uploader;
+        address uploader; // uploader of the firmware
         string hash; // hash of the firmware
+        string name; // name of the firmware
         bool enabled; // whether the firmware is enabled
         bool stable; // whether the firmware is a stable release
         uint256 timestamp; // time of the creation of the update
     }
     
-    struct UpdateInput
+    struct CreateUpdateInput
     {
         string version; // version of the firmware
         string hash; // hash of the firmware
+        string name; // name of the firmware
         bool enabled; // whether the firmware is enabled
         bool stable; // whether the firmware is a stable release
+    }
+    
+    struct EditUpdateInput
+    {
+        uint64 id; // id of the update
+        string name; // name of the firmware
+        bool enabled; // whether the firmware is enabled
     }
 
     Update[] private firmwareUpdates;
@@ -196,9 +205,9 @@ contract FirmwareUpdates
 
     /** 
      * @dev Creates a firmware update
-     * @param update input of type UpdateInput
+     * @param update input of type CreateUpdateInput
      */
-    function createFirmwareUpdate(UpdateInput calldata update) public uniqueVersionGuard(update.version) updaterGuard()
+    function createFirmwareUpdate(CreateUpdateInput calldata update) public uniqueVersionGuard(update.version) updaterGuard()
     {
         firmwareUpdates.push(Update(
             {
@@ -206,6 +215,7 @@ contract FirmwareUpdates
                 version: update.version,
                 uploader: msg.sender,
                 hash: update.hash,
+                name: update.name,
                 enabled: update.enabled,
                 stable: update.stable,
                 // solhint-disable-next-line not-rely-on-time
@@ -216,18 +226,18 @@ contract FirmwareUpdates
     
     /** 
      * @dev Edits a firmware update's enabled status
-     * @param id of firmware update
-     * @param enabled whether updates is enabled
+     * @param newValues new values of type EditUpdateInput
      * @return firmwareUpdate_ the edited firmware update
      */
-    function editFirmwareUpdate(uint64 id, bool enabled) public updaterGuard()
+    function editFirmwareUpdate(EditUpdateInput calldata newValues) public updaterGuard()
         returns (Update memory firmwareUpdate_)
     {
         for (uint p = 0; p < firmwareUpdates.length; p++)
         {
-            if (firmwareUpdates[p].id == id)
+            if (firmwareUpdates[p].id == newValues.id)
             {
-                firmwareUpdates[p].enabled = enabled;
+                firmwareUpdates[p].enabled = newValues.enabled;
+                firmwareUpdates[p].name = newValues.name;
                 return firmwareUpdates[p];
             }
         }
