@@ -1,16 +1,7 @@
-import { Web3 } from 'web3';
-import config from '$config';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
-import 'dotenv/config.js';
+
 import type { FirmwareUdpdate } from '$src/types/firmware';
-
-const web3 = new Web3(new Web3.providers.HttpProvider(config.networkAddress));
-const [defaultAccount] = await web3.eth.getAccounts();
-const FirmwareUpdatesContract = new web3.eth.Contract(config.abi, config.deployedAddress);
-
-if (!process.env.TOKEN) {
-	throw new Error('Missing TOKEN');
-}
+import { web3Helper } from '$src/helpers';
 
 function parseResponse(
 	input?: Record<string, bigint | boolean | string>
@@ -47,10 +38,19 @@ function parseResponse(
 }
 export const GET: RequestHandler = async ({ params }) => {
 	try {
-		const id = params.id ?? -1;
+		const id =
+			typeof params.id === 'string' && !Number.isNaN(Number.parseInt(params.id))
+				? Number.parseInt(params.id)
+				: -1;
+
+		if (id < 0) {
+			throw new Error('Invalid ID');
+		}
+
+		const { defaultAccount, firmwareUpdatesContract } = await web3Helper();
 
 		const update = parseResponse(
-			await FirmwareUpdatesContract.methods.getFirmwareUpdate(id).call({ from: defaultAccount })
+			await firmwareUpdatesContract.methods.getFirmwareUpdate(id).call({ from: defaultAccount })
 		);
 
 		if (!update) {
@@ -61,7 +61,7 @@ export const GET: RequestHandler = async ({ params }) => {
 
 		return json({ ...update, fileUrl });
 	} catch (e) {
-		console.log(e);
+		console.trace(e);
 		throw error(500, 'Could not get firmware update');
 	}
 };
@@ -76,15 +76,26 @@ export const PUT: RequestHandler = async ({ request, params }) => {
 			throw new Error('Invalid input');
 		}
 
+		const { defaultAccount, firmwareUpdatesContract } = await web3Helper();
+
 		const input = {
 			id: params.id,
 			name,
 			enabled
 		};
 
-		await FirmwareUpdatesContract.methods.editFirmwareUpdate(input).send({
+		/**
+		 * @TODO
+        	// Estimate gas consumption
+        	const gas = await firmwareUpdatesContract.estimateGas({
+            	from: defaultAccount,
+        	});
+        	console.info('estimateGas', gas, '| deployer account', defaultAccount);
+		 */
+
+		await firmwareUpdatesContract.methods.editFirmwareUpdate(input).send({
 			from: defaultAccount,
-			gas: '10000000' // TODO!
+			gas: '10000000' // @TODO
 		});
 
 		return json({ id: params.id }, { status: 200 });

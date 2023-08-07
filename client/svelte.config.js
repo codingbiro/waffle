@@ -13,7 +13,7 @@ const config = {
 		// See https://kit.svelte.dev/docs/adapters for more information about adapters.
 		adapter: adapter(),
 		alias: {
-			$config: resolve('config', 'index.ts'),
+			$config: resolve('config'),
 			$src: resolve('src')
 		}
 	}

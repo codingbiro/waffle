@@ -1,18 +1,8 @@
-import { Web3 } from 'web3';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
-import { Web3Storage, type CIDString } from 'web3.storage';
+import type { CIDString } from 'web3.storage';
 
-import config from '$config';
-import 'dotenv/config.js';
 import type { FirmwareUdpdate } from '$src/types/firmware';
-
-const web3 = new Web3(new Web3.providers.HttpProvider(config.networkAddress));
-const [defaultAccount] = await web3.eth.getAccounts();
-const FirmwareUpdatesContract = new web3.eth.Contract(config.abi, config.deployedAddress);
-if (!process.env.TOKEN) {
-	throw new Error('Missing TOKEN');
-}
-const client = new Web3Storage({ token: process.env.TOKEN });
+import { web3Helper, web3storageHelper } from '$src/helpers';
 
 function parseResponse(input?: Record<string, bigint | boolean | string>[]): FirmwareUdpdate[] {
 	if (!input) {
@@ -51,9 +41,11 @@ function parseResponse(input?: Record<string, bigint | boolean | string>[]): Fir
 
 export async function GET() {
 	try {
+		const { defaultAccount, firmwareUpdatesContract } = await web3Helper();
+
 		// Get available updates again
 		const updates = parseResponse(
-			await FirmwareUpdatesContract.methods.getFirmwareUpdates().call({ from: defaultAccount })
+			await firmwareUpdatesContract.methods.getFirmwareUpdates().call({ from: defaultAccount })
 		);
 
 		return json(updates);
@@ -64,6 +56,8 @@ export async function GET() {
 }
 
 async function handleUpload(file: File) {
+	const client = web3storageHelper();
+
 	// Save local CID
 	let localCid = '';
 	// This gets triggered before the CAR is uploaded to the server
@@ -94,6 +88,8 @@ export const POST: RequestHandler = async ({ request }) => {
 			throw new Error('Invalid input');
 		}
 
+		const { defaultAccount, firmwareUpdatesContract } = await web3Helper();
+
 		const hash = await handleUpload(file as File);
 
 		const input = {
@@ -104,9 +100,18 @@ export const POST: RequestHandler = async ({ request }) => {
 			name
 		};
 
-		await FirmwareUpdatesContract.methods.createFirmwareUpdate(input).send({
+		/**
+		 * @TODO
+        	// Estimate gas consumption
+        	const gas = await firmwareUpdatesContract.estimateGas({
+            	from: defaultAccount,
+        	});
+        	console.info('estimateGas', gas, '| deployer account', defaultAccount);
+		 */
+
+		await firmwareUpdatesContract.methods.createFirmwareUpdate(input).send({
 			from: defaultAccount,
-			gas: '1000000' // TODO!
+			gas: '1000000' //
 		});
 
 		return json({ cid: hash }, { status: 201 });

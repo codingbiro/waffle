@@ -1,11 +1,10 @@
 import { json } from '@sveltejs/kit';
-import { Web3 } from 'web3';
-import config from '$config';
-
-const web3 = new Web3(new Web3.providers.HttpProvider(config.networkAddress));
-const [defaultAccount] = await web3.eth.getAccounts();
+import config from '$config/index';
+import { web3Helper } from '$src/helpers';
 
 export async function GET() {
+	const { defaultAccount } = await web3Helper();
+
 	return json({
 		account: {
 			address: defaultAccount
