@@ -2,6 +2,7 @@
 target/*
 upload.zip
 *.txt
+!satoshi.txt
 .DS_Store
 client/build
 client/.svelte-kit

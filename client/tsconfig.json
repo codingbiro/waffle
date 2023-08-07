@@ -11,7 +11,7 @@
 		"strict": true,
 		"baseUrl": "./",
 		"paths": {
-			"$config": ["config/index.ts"],
+			"$config/*": ["config/*"],
 			"$src/*": ["src/*"]
 		}
 	}

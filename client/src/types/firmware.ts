@@ -4,16 +4,13 @@ export interface FirmwareUdpdate {
 	uploader: string;
 	hash: string;
 	name: string;
-	enabled: boolean;
-	stable: boolean;
+	isEnabled: boolean;
+	isStable: boolean;
 	timestamp: number;
 }
 
-export type NewFirmware = Pick<FirmwareUdpdate, 'version' | 'enabled' | 'stable' | 'name'>;
+export type NewFirmware = Pick<FirmwareUdpdate, 'version' | 'isEnabled' | 'isStable' | 'name'>;
 
-export type EditFirmware = Pick<
-	FirmwareUdpdate,
-	'id' | 'hash' | 'enabled' | 'name' | 'uploader'
-> & { url: string };
+export type EditFirmware = FirmwareUdpdate & { url: string };
 
-export type ShowHideEditFn = (v: Omit<EditFirmware, 'url'> | null) => Promise<void>;
+export type ShowHideEditFn = (v: FirmwareUdpdate | null) => Promise<void>;

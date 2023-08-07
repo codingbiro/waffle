@@ -1,56 +1,20 @@
-import { Web3 } from 'web3';
-import config from '$config';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
-import 'dotenv/config.js';
-import type { FirmwareUdpdate } from '$src/types/firmware';
 
-const web3 = new Web3(new Web3.providers.HttpProvider(config.networkAddress));
-const [defaultAccount] = await web3.eth.getAccounts();
-const FirmwareUpdatesContract = new web3.eth.Contract(config.abi, config.deployedAddress);
+import { web3Helper } from '$src/helpers';
+import { parseParamToNumber, parseUpdate } from '$src/utils';
 
-if (!process.env.TOKEN) {
-	throw new Error('Missing TOKEN');
-}
-
-function parseResponse(
-	input?: Record<string, bigint | boolean | string>
-): FirmwareUdpdate | undefined {
-	if (!input) {
-		return undefined;
-	}
-
-	if (
-		typeof input.id === 'bigint' &&
-		typeof input.version === 'string' &&
-		typeof input.uploader === 'string' &&
-		typeof input.hash === 'string' &&
-		typeof input.name === 'string' &&
-		typeof input.enabled === 'boolean' &&
-		typeof input.stable === 'boolean' &&
-		typeof input.timestamp === 'bigint'
-	) {
-		return input.hash
-			? {
-					id: Number(input.id),
-					version: input.version,
-					uploader: input.uploader,
-					hash: input.hash,
-					name: input.name,
-					enabled: input.enabled,
-					stable: input.stable,
-					timestamp: Number(input.timestamp)
-			  }
-			: undefined;
-	}
-
-	return undefined;
-}
 export const GET: RequestHandler = async ({ params }) => {
 	try {
-		const id = params.id ?? -1;
+		const id = parseParamToNumber(params.id);
 
-		const update = parseResponse(
-			await FirmwareUpdatesContract.methods.getFirmwareUpdate(id).call({ from: defaultAccount })
+		if (id < 0) {
+			throw new Error('Invalid ID');
+		}
+
+		const { defaultAccount, firmwareUpdatesContract } = await web3Helper();
+
+		const update = parseUpdate(
+			await firmwareUpdatesContract.methods.getFirmwareUpdate(id).call({ from: defaultAccount })
 		);
 
 		if (!update) {
@@ -61,33 +25,50 @@ export const GET: RequestHandler = async ({ params }) => {
 
 		return json({ ...update, fileUrl });
 	} catch (e) {
-		console.log(e);
+		console.trace(e);
 		throw error(500, 'Could not get firmware update');
 	}
 };
 
 export const PUT: RequestHandler = async ({ request, params }) => {
 	try {
-		const values = await request.formData();
-		const enabled = values.get('enabled') === 'true';
-		const name = typeof values.get('name') === 'string' ? (values.get('name') as string) : '';
+		const id = parseParamToNumber(params.id);
 
-		if (!params.id || !name) {
+		const values = await request.formData();
+		const isEnabled = values.get('isEnabled') === 'true';
+		const isStable = values.get('isStable') === 'true';
+		const name = typeof values.get('name') === 'string' ? (values.get('name') as string) : '';
+		const version =
+			typeof values.get('version') === 'string' ? (values.get('version') as string) : '';
+
+		if (id < 0 || !name) {
 			throw new Error('Invalid input');
 		}
 
+		const { defaultAccount, firmwareUpdatesContract } = await web3Helper();
+
 		const input = {
-			id: params.id,
+			isEnabled,
+			isStable,
 			name,
-			enabled
+			version
 		};
 
-		await FirmwareUpdatesContract.methods.editFirmwareUpdate(input).send({
+		/**
+		 * @TODO
+        	// Estimate gas consumption
+        	const gas = await firmwareUpdatesContract.estimateGas({
+            	from: defaultAccount,
+        	});
+        	console.info('estimateGas', gas, '| deployer account', defaultAccount);
+		 */
+
+		await firmwareUpdatesContract.methods.editFirmwareUpdate(id, input).send({
 			from: defaultAccount,
-			gas: '10000000' // TODO!
+			gas: '10000000' // @TODO
 		});
 
-		return json({ id: params.id }, { status: 200 });
+		return json({ id }, { status: 200 });
 	} catch (e) {
 		console.trace(e);
 		throw error(500, 'Could not edit firmware update');
