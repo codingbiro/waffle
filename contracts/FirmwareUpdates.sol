@@ -11,46 +11,53 @@ contract FirmwareUpdates
     address private owner; // Owner of the contract
     address[] private updaters; // Users with uploader rights
 
-    event Debug(string info);
-
     struct Update
     {
+        string hash; // CID
         uint64 id; // id of the update
-        string version; // version of the firmware
-        address uploader; // uploader of the firmware
-        string hash; // hash of the firmware
+        bool isEnabled; // whether the firmware is enabled
+        bool isStable; // whether the firmware is a stable release
         string name; // name of the firmware
-        bool enabled; // whether the firmware is enabled
-        bool stable; // whether the firmware is a stable release
         uint256 timestamp; // time of the creation of the update
+        address uploader; // uploader of the firmware
+        string version; // version of the firmware
     }
     
+    // Input struct for creating an update
     struct CreateUpdateInput
     {
-        string version; // version of the firmware
-        string hash; // hash of the firmware
+        string hash; // CID
+        bool isEnabled; // whether the firmware is enabled
+        bool isStable; // whether the firmware is a stable release
         string name; // name of the firmware
-        bool enabled; // whether the firmware is enabled
-        bool stable; // whether the firmware is a stable release
+        string version; // version of the firmware
     }
     
+    // Input struct for editing an update
     struct EditUpdateInput
     {
-        uint64 id; // id of the update
+        bool isEnabled; // whether the firmware is enabled
+        bool isStable; // whether the firmware is a stable release
         string name; // name of the firmware
-        bool enabled; // whether the firmware is enabled
+        string version; // version of the firmware
     }
 
-    Update[] private firmwareUpdates;
+    Update[] private firmwareUpdates; // Firmware updates
+
+    event Debug(string info); // For debugging
 
     /** 
      * @dev init
      */
     constructor()
     {
-        owner = msg.sender;
-        updaters.push(msg.sender);
+        owner = msg.sender; // Set the owner to the sender of the message
+        updaters.push(msg.sender); // Add owner as updater
     }
+
+    /*
+     * Modifier and util functions
+    */
 
     // Modifier to check if caller is owner
     modifier ownerGuard
@@ -60,7 +67,7 @@ contract FirmwareUpdates
     }
 
     /** 
-     * @dev Check if address is updater
+     * @dev Util function checking if address is updater
      * @param updater the updater
      * @return idx index of the updater if found, otherwise -1
     */
@@ -84,59 +91,68 @@ contract FirmwareUpdates
     }
 
     /** 
-     * @dev Compares 2 strings for equality with different data location
+     * @dev Util function comparing 2 strings for equality with different data location
      * @param string1 storage string
      * @param string2 calldata string
      * @return true if string1 is equal to string2
     */
-    function safeStringEquality(string storage string1, string calldata string2) private pure returns(bool)
+    function safeStringEquality(string storage string1, string calldata string2) private pure
+        returns(bool)
     {
         return keccak256(bytes(string1)) == keccak256(bytes(string2));
     }
 
-    // Modifier to check if update version is unique
-    modifier uniqueVersionGuard(string calldata version)
+    // Modifier to check if update version is unique based on the name of the firmware
+    modifier uniqueVersionGuard(string calldata firmwareName, string calldata version, int64 id)
     {
-        bool found = false;
         for (uint p = 0; p < firmwareUpdates.length; p++)
         {
-            if (safeStringEquality(firmwareUpdates[p].version, version))
+            if
+            (
+                safeStringEquality(firmwareUpdates[p].name, firmwareName) &&
+                safeStringEquality(firmwareUpdates[p].version, version) &&
+                id != int64(firmwareUpdates[p].id)
+            )
             {
-                found = true;
                 revert("Update version must be unique.");
             }
         }
         _;
     }
+
+    /*
+     * Management functions (for the owner only)
+    */
     
     /** 
      * @dev Transfer ownership of the contract
-     * @param recipient the address of the new owner
+     * @param newOwner the address of the new owner
      */
-    function transferOwnership(address recipient) public ownerGuard()
+    function transferOwnership(address newOwner) public ownerGuard()
     {
         int index = isUpdater(owner);
+        // If previous owner is updater, remove them
         if (index > -1)
         {
             delete updaters[uint(index)];
         }
-        
-        owner = recipient;
-        index = isUpdater(recipient);
+        owner = newOwner;
+        index = isUpdater(newOwner);
+        // Add new owner as updater, unless it is already one
         if (index == -1)
         {
-            updaters.push(recipient);
+            updaters.push(newOwner);
         }
     }
     
     /** 
-     * @dev Add an updater
-     * @param updater the updater
+     * @dev Adds an updater
+     * @param newUpdater the updater
      */
-    function addUpdater(address updater) public ownerGuard()
+    function addUpdater(address newUpdater) public ownerGuard()
     {
-        require(isUpdater(updater) == -1, "User is already an updater.");
-        updaters.push(updater);
+        require(isUpdater(newUpdater) == -1, "User is already an updater.");
+        updaters.push(newUpdater);
     }
     
     /** 
@@ -150,31 +166,9 @@ contract FirmwareUpdates
         delete updaters[uint(index)];
     }
 
-    /** 
-     * @dev Returns available firmware updates
-     */
-    function getAvailableFirmwareUpdates() public view
-        returns (Update[] memory firmwareUpdates_)
-    {
-        uint availableCounter = 0;
-        for (uint p = 0; p < firmwareUpdates.length; p++)
-        {
-            if (firmwareUpdates[p].enabled)
-            {
-                availableCounter = availableCounter + 1;
-            }
-        }
-        firmwareUpdates_ = new Update[](availableCounter);
-        uint counter = 0;
-        for (uint p = 0; p < firmwareUpdates.length; p++)
-        {
-            if (firmwareUpdates[p].enabled)
-            {
-                firmwareUpdates_[counter] = firmwareUpdates[p];
-                counter = counter + 1;
-            }
-        }
-    }
+    /*
+     * Getter functions for updaters
+    */
 
     /** 
      * @dev Returns all firmware updates (for updaters only)
@@ -187,37 +181,91 @@ contract FirmwareUpdates
     }
 
     /** 
-     * @dev Returns a firmware update
+     * @dev Returns a firmware update (for updaters only)
      * @param id of firmware update
      * @return firmwareUpdate_ the requested firmware update
      */
-    function getFirmwareUpdate(uint64 id) public view
-        returns (Update memory firmwareUpdate_)
+    function getFirmwareUpdate(uint64 id) public view updaterGuard()
+        returns (Update memory)
     {
         for (uint p = 0; p < firmwareUpdates.length; p++)
         {
             if (firmwareUpdates[p].id == id)
             {
-                firmwareUpdate_ = firmwareUpdates[p];
+                return firmwareUpdates[p];
+            }
+        }
+        revert("Update not found");
+    }
+
+    /*
+     * Public getter functions
+    */
+
+    /** 
+     * @dev Returns a firmware update if available
+     * @param id of firmware update
+     * @return firmwareUpdate_ the requested firmware update
+     */
+    function getAvailableFirmwareUpdate(uint64 id) public view
+        returns (Update memory)
+    {
+        for (uint p = 0; p < firmwareUpdates.length; p++)
+        {
+            if (firmwareUpdates[p].id == id && firmwareUpdates[p].isEnabled)
+            {
+                return firmwareUpdates[p];
+            }
+        }
+        revert("Update not found");
+    }
+
+    /** 
+     * @dev Returns available firmware updates
+     */
+    function getAvailableFirmwareUpdates() public view
+        returns (Update[] memory firmwareUpdates_)
+    {
+        uint availableCounter = 0;
+        for (uint p = 0; p < firmwareUpdates.length; p++)
+        {
+            if (firmwareUpdates[p].isEnabled)
+            {
+                availableCounter = availableCounter + 1;
+            }
+        }
+        firmwareUpdates_ = new Update[](availableCounter);
+        uint counter = 0;
+        for (uint p = 0; p < firmwareUpdates.length; p++)
+        {
+            if (firmwareUpdates[p].isEnabled)
+            {
+                firmwareUpdates_[counter] = firmwareUpdates[p];
+                counter = counter + 1;
             }
         }
     }
+
+    /*
+     * Create/Edit functions (for updaters only)
+    */
 
     /** 
      * @dev Creates a firmware update
      * @param update input of type CreateUpdateInput
      */
-    function createFirmwareUpdate(CreateUpdateInput calldata update) public uniqueVersionGuard(update.version) updaterGuard()
+    function createFirmwareUpdate(CreateUpdateInput calldata update) public
+        updaterGuard() uniqueVersionGuard(update.name, update.version, -1)
     {
         firmwareUpdates.push(Update(
             {
                 id: uint64(firmwareUpdates.length),
                 version: update.version,
                 uploader: msg.sender,
-                hash: update.hash,
+                hash: update.hash, // CID
                 name: update.name,
-                enabled: update.enabled,
-                stable: update.stable,
+                isEnabled: update.isEnabled,
+                isStable: update.isStable,
                 // solhint-disable-next-line not-rely-on-time
                 timestamp: block.timestamp
             }
@@ -226,18 +274,22 @@ contract FirmwareUpdates
     
     /** 
      * @dev Edits a firmware update's enabled status
+     * @param id id of edited update
      * @param newValues new values of type EditUpdateInput
      * @return firmwareUpdate_ the edited firmware update
      */
-    function editFirmwareUpdate(EditUpdateInput calldata newValues) public updaterGuard()
+    function editFirmwareUpdate(uint64 id, EditUpdateInput calldata newValues) public
+        updaterGuard() uniqueVersionGuard(newValues.name, newValues.version, int64(id))
         returns (Update memory firmwareUpdate_)
     {
         for (uint p = 0; p < firmwareUpdates.length; p++)
         {
-            if (firmwareUpdates[p].id == newValues.id)
+            if (firmwareUpdates[p].id == id)
             {
-                firmwareUpdates[p].enabled = newValues.enabled;
+                firmwareUpdates[p].isEnabled = newValues.isEnabled;
+                firmwareUpdates[p].isStable = newValues.isStable;
                 firmwareUpdates[p].name = newValues.name;
+                firmwareUpdates[p].version = newValues.version;
                 return firmwareUpdates[p];
             }
         }

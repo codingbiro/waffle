@@ -1,3 +1,4 @@
+TODO: Refactor / Update
 # Waffle
 A Secure Firmware Dispatch System for IoT Devices using Blockchain - a MSC Thesis project by Vince Biro at the Technical University of Denmark.
 ## Project information
