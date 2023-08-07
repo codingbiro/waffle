@@ -3,6 +3,7 @@ import type { CIDString } from 'web3.storage';
 
 import type { FirmwareUdpdate } from '$src/types/firmware';
 import { web3Helper, web3storageHelper } from '$src/helpers';
+import { parseUpdate } from '$src/utils';
 
 function parseResponse(input?: Record<string, bigint | boolean | string>[]): FirmwareUdpdate[] {
 	if (!input) {
@@ -12,27 +13,9 @@ function parseResponse(input?: Record<string, bigint | boolean | string>[]): Fir
 	const returnArray: FirmwareUdpdate[] = [];
 
 	for (const i of input) {
-		if (
-			i &&
-			typeof i.id === 'bigint' &&
-			typeof i.version === 'string' &&
-			typeof i.uploader === 'string' &&
-			typeof i.hash === 'string' &&
-			typeof i.name === 'string' &&
-			typeof i.enabled === 'boolean' &&
-			typeof i.stable === 'boolean' &&
-			typeof i.timestamp === 'bigint'
-		) {
-			returnArray.push({
-				id: Number(i.id),
-				version: i.version,
-				uploader: i.uploader,
-				hash: i.hash,
-				name: i.name,
-				enabled: i.enabled,
-				stable: i.stable,
-				timestamp: Number(i.timestamp)
-			});
+		const update = parseUpdate(i);
+		if (update) {
+			returnArray.push(update);
 		}
 	}
 
@@ -77,12 +60,12 @@ async function handleUpload(file: File) {
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const values = await request.formData();
+		const file = typeof values.get('file') === 'object' ? (values.get('file') as File) : undefined;
+		const isEnabled = values.get('isEnabled') === 'true';
+		const isStable = values.get('isStable') === 'true';
+		const name = typeof values.get('name') === 'string' ? (values.get('name') as string) : '';
 		const version =
 			typeof values.get('version') === 'string' ? (values.get('version') as string) : '';
-		const name = typeof values.get('name') === 'string' ? (values.get('name') as string) : '';
-		const enabled = values.get('enabled') === 'true';
-		const stable = values.get('stable') === 'true';
-		const file = typeof values.get('file') === 'object' ? (values.get('file') as File) : undefined;
 
 		if (!version || !file || !name) {
 			throw new Error('Invalid input');
@@ -93,11 +76,11 @@ export const POST: RequestHandler = async ({ request }) => {
 		const hash = await handleUpload(file as File);
 
 		const input = {
-			version,
-			enabled,
-			stable,
 			hash,
-			name
+			isEnabled,
+			isStable,
+			name,
+			version
 		};
 
 		/**

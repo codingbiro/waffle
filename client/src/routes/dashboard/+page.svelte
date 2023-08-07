@@ -9,7 +9,7 @@
 	let create_visible = false;
 	
 	/** @type {import('$src/types/firmware').NewFirmware} */
-	let new_item = { version: '', enabled: false, stable: false, name: '' };
+	let new_item = { isEnabled: false, isStable: false, name: '', version: '' };
 
 	/** @type {import('src/types/firmware').EditFirmware | null} */
 	let edit_item = null;
@@ -41,12 +41,13 @@
 			error = 'validation';
 			return;
 		}
+
 		const input = new FormData();
 		input.append('file', files[0]);
-		input.append('version', new_item.version);
+		input.append('isEnabled', new_item.isEnabled.toString());
+		input.append('isStable', new_item.isStable.toString());
 		input.append('name', new_item.name);
-		input.append('enabled', new_item.enabled.toString());
-		input.append('stable', new_item.stable.toString());
+		input.append('version', new_item.version);
 
 		loading = true;
 		const { status } = await fetch('/api/updates', {
@@ -58,20 +59,23 @@
 			error = 'create';
 		} else {
 			create_visible = false;
-			new_item = { version: '', enabled: false, stable: false, name: '' };
+			new_item = { isEnabled: false, isStable: false, name: '', version: '' };
 			invalidateAll();
 		}
 	}
 
 	async function edit_update() {
 		error = '';
-		if (!edit_item || Number.isNaN(edit_item.id) || !edit_item.name) {
+		if (!edit_item || Number.isNaN(edit_item.id) || !edit_item.name || !edit_item.version) {
 			error = 'validation';
 			return;
 		}
+
 		const input = new FormData();
-		input.append('enabled', edit_item.enabled.toString());
+		input.append('isEnabled', edit_item.isEnabled.toString());
+		input.append('isStable', edit_item.isStable.toString());
 		input.append('name', edit_item.name);
+		input.append('version', edit_item.version);
 
 		loading = true;
 		const { status } = await fetch('/api/updates/' + edit_item.id, {
@@ -79,6 +83,7 @@
 			body: input
 		});
 		loading = false;
+
 		if (status !== 200) {
 			error = 'edit';
 		} else {
@@ -126,14 +131,14 @@
 			<div>
 				<p>Set as enabled</p>
 				<label class="switch">
-					<input type="checkbox" bind:checked={new_item.enabled} />
+					<input type="checkbox" bind:checked={new_item.isEnabled} />
 					<span class="slider" />
 				</label>
 			</div>
 			<div>
 				<p>Tag as stable release</p>
 				<label class="switch">
-					<input type="checkbox" bind:checked={new_item.stable} />
+					<input type="checkbox" bind:checked={new_item.isStable} />
 					<span class="slider" />
 				</label>
 			</div>
@@ -172,6 +177,10 @@
 				<input class="string full" bind:value={edit_item.name} />
 			</div>
 			<div>
+				<p>version</p>
+				<input class="string full" bind:value={edit_item.version} />
+			</div>
+			<div>
 				<p>uploader</p>
 				<input class="string full" value={edit_item.uploader} disabled />
 			</div>
@@ -182,7 +191,14 @@
 			<div>
 				<p>Set as enabled</p>
 				<label class="switch">
-					<input type="checkbox" bind:checked={edit_item.enabled} />
+					<input type="checkbox" bind:checked={edit_item.isEnabled} />
+					<span class="slider" />
+				</label>
+			</div>
+			<div>
+				<p>Set as stable</p>
+				<label class="switch">
+					<input type="checkbox" bind:checked={edit_item.isStable} />
 					<span class="slider" />
 				</label>
 			</div>
@@ -230,22 +246,22 @@
 		<th>Timestamp</th>
 	</tr>
 	{#if data?.updates?.length}
-		{#each data.updates as { id, version, uploader, hash, enabled, stable, timestamp, name }}
-			<tr on:click={() => void showhide_edit({ id, hash, enabled, name, uploader })}>
+		{#each data.updates as { id, version, uploader, hash, isEnabled, isStable, timestamp, name }}
+			<tr on:click={() => void showhide_edit({ id, version, uploader, hash, isEnabled, isStable, timestamp, name })}>
 				<td>{id}</td>
 				<td>{name}</td>
 				<td>{version}</td>
 				<td>{uploader}</td>
 				<td>{hash}</td>
 				<td class="small">
-					{#if enabled}
+					{#if isEnabled}
 						<span class="material-symbols-outlined">&#xe5ca</span>
 					{:else}
 						<span class="material-symbols-outlined">&#xe5cd</span>
 					{/if}
 				</td>
 				<td class="small">
-					{#if stable}
+					{#if isStable}
 						<span class="material-symbols-outlined">&#xe5ca</span>
 					{:else}
 						<span class="material-symbols-outlined">&#xe5cd</span>
