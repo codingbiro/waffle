@@ -4,24 +4,30 @@ import type { CIDString } from 'web3.storage';
 import type { FirmwareUdpdate } from '$src/types/firmware';
 import { web3Helper, web3storageHelper } from '$src/helpers';
 import { parseUpdate } from '$src/utils';
+import config from '$config/index';
 
 function parseResponse(input?: Record<string, bigint | boolean | string>[]): FirmwareUdpdate[] {
+	// Invalid response
 	if (!input) {
 		return [];
 	}
 
 	const returnArray: FirmwareUdpdate[] = [];
-
 	for (const i of input) {
 		const update = parseUpdate(i);
+		// Get all valid updates
 		if (update) {
 			returnArray.push(update);
 		}
 	}
 
+	// Return valid updates
 	return returnArray;
 }
 
+/**
+ * @returns All FirmwareUdpdates
+ */
 export async function GET() {
 	try {
 		const { defaultAccount, firmwareUpdatesContract } = await web3Helper();
@@ -31,6 +37,7 @@ export async function GET() {
 			await firmwareUpdatesContract.methods.getFirmwareUpdates().call({ from: defaultAccount })
 		);
 
+		// Return JSON response with Updates
 		return json(updates);
 	} catch (e) {
 		console.log(e);
@@ -38,6 +45,11 @@ export async function GET() {
 	}
 }
 
+/**
+ * @description Uploads a file to Web3.Storage
+ * @param file file to be uploaded
+ * @returns CID of uploaded file
+ */
 async function handleUpload(file: File) {
 	const client = web3storageHelper();
 
@@ -54,11 +66,17 @@ async function handleUpload(file: File) {
 		throw new Error('CID mismatch');
 	}
 
+	// Return CID
 	return serverCid;
 }
 
+/**
+ * @description Creates a new firmware update
+ * @returns CID of uploaded file
+ */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
+		// Get values from request's formData
 		const values = await request.formData();
 		const file = typeof values.get('file') === 'object' ? (values.get('file') as File) : undefined;
 		const isEnabled = values.get('isEnabled') === 'true';
@@ -67,14 +85,17 @@ export const POST: RequestHandler = async ({ request }) => {
 		const version =
 			typeof values.get('version') === 'string' ? (values.get('version') as string) : '';
 
+		// Validate input
 		if (!version || !file || !name) {
 			throw new Error('Invalid input');
 		}
 
 		const { defaultAccount, firmwareUpdatesContract } = await web3Helper();
 
+		// Upload file
 		const hash = await handleUpload(file as File);
 
+		// Smart contract's CreateUpdateInput
 		const input = {
 			hash,
 			isEnabled,
@@ -83,20 +104,16 @@ export const POST: RequestHandler = async ({ request }) => {
 			version
 		};
 
-		/**
-		 * @TODO
-        	// Estimate gas consumption
-        	const gas = await firmwareUpdatesContract.estimateGas({
-            	from: defaultAccount,
-        	});
-        	console.info('estimateGas', gas, '| deployer account', defaultAccount);
-		 */
+		// Estimate TX gas cost
+		const gas = await firmwareUpdatesContract.methods.createFirmwareUpdate(input).estimateGas();
 
+		// Save update with smart contract
 		await firmwareUpdatesContract.methods.createFirmwareUpdate(input).send({
 			from: defaultAccount,
-			gas: '1000000' //
+			gas: gas?.toString() ?? config.DEFAULT_GAS
 		});
 
+		// Return CID
 		return json({ cid: hash }, { status: 201 });
 	} catch (e) {
 		console.trace(e);

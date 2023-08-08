@@ -8,10 +8,13 @@ const contractName = 'FirmwareUpdates';
 const networkAddress = 'http://127.0.0.1:' + PORT;
 const clientAddress = 'http://127.0.0.1:5249';
 
+const DEFAULT_GAS = '1000000';
+
 export default {
 	abi,
 	clientAddress,
 	contractName,
+	DEFAULT_GAS,
 	deployedAddress,
 	networkAddress
 };
