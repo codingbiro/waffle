@@ -6,7 +6,7 @@ import { web3Helper, web3storageHelper } from '$src/helpers';
 import { parseUpdate } from '$src/utils';
 import config from '$config/index';
 
-function parseResponse(input?: Record<string, bigint | boolean | string>[]): FirmwareUdpdate[] {
+function parseResponse(input?: Record<string, bigint | boolean | string>[]) {
 	// Invalid response
 	if (!input) {
 		return [];
