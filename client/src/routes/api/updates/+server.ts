@@ -59,7 +59,7 @@ async function handleUpload(file: File) {
 	const onRootCidReady = (cid: CIDString) => (localCid = cid);
 
 	// Upload file to Filecoin
-	const serverCid = await client.put([file], { wrapWithDirectory: false, onRootCidReady });
+	const serverCid = await client.put([file], { onRootCidReady });
 
 	// Verify CID from server
 	if (localCid !== serverCid) {
@@ -93,7 +93,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const { defaultAccount, firmwareUpdatesContract } = await web3Helper();
 
 		// Upload file
-		const hash = await handleUpload(file as File);
+		const hash = await handleUpload(file);
 
 		// Smart contract's CreateUpdateInput
 		const input = {

@@ -1,6 +1,6 @@
 import { error, json, type RequestHandler } from '@sveltejs/kit';
 
-import { web3Helper } from '$src/helpers';
+import { web3Helper, web3storageHelper } from '$src/helpers';
 import { parseParamToNumber, parseUpdate } from '$src/utils';
 import config from '$config/index';
 
@@ -18,6 +18,7 @@ export const GET: RequestHandler = async ({ params }) => {
 		}
 
 		const { defaultAccount, firmwareUpdatesContract } = await web3Helper();
+		const client = web3storageHelper();
 
 		// Parse update from smart contract
 		const update = parseUpdate(
@@ -29,8 +30,24 @@ export const GET: RequestHandler = async ({ params }) => {
 			throw new Error('Invalid udpate');
 		}
 
+		const res = await client.get(update.hash);
+
+		// File not found
+		if (!res) {
+			throw new Error('Invalid file');
+		}
+
+		// Get filename
+		const files = await res.files();
+		const fileName = files?.length ? files[0]?.name ?? '' : '';
+
+		// Filename not found
+		if (!fileName) {
+			throw new Error('Invalid filename');
+		}
+
 		// Contruct file url for download
-		const fileUrl = `https://${update.hash}.ipfs.w3s.link/`;
+		const fileUrl = `https://${update.hash}.ipfs.w3s.link/${fileName}`;
 
 		// Return JSON response with update and fileUrl
 		return json({ ...update, fileUrl });
