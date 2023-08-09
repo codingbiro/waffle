@@ -1,7 +1,9 @@
 {
-	"name": "client",
-	"version": "0.0.1",
+	"name": "waffle-client",
+	"version": "1.0.0",
 	"private": true,
+	"author": "codingbiro <hello@birovince.com>",
+	"license": "MIT",
 	"scripts": {
 		"dev": "vite dev --port 5249",
 		"build": "vite build",

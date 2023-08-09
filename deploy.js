@@ -32,7 +32,6 @@ async function deploy() {
         const gas = await firmwareUpdatesContract.estimateGas({
             from: defaultAccount,
         });
-        info('estimateGas', gas, '| deployer account', defaultAccount);
 
         // Deploy the contract to the network
         const tx = await firmwareUpdatesContract.send({
@@ -43,7 +42,7 @@ async function deploy() {
         // Write the Contract address to a new file
         const deployedAddressPath = path.join(__dirname, config.deployedContractAddress);
         fs.writeFileSync(deployedAddressPath, tx.options.address);
-        info('DeploymentSuccess');
+        info('DeploymentSuccess' + ' (deployer account:', defaultAccount + ')');
     } catch (err) {
         trace(err);
     }

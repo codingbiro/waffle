@@ -203,14 +203,14 @@
 				</label>
 			</div>
 			<div>
-				<button class="publish" style="margin:auto auto 0 0">
-					<a href={edit_item.url} target="_blank" download>
+				<a class="publish" href={edit_item.url} download target="_blank">
+					<button class="publish" style="margin:auto auto 0 0">
 						Download <span class="material-symbols-outlined">&#xf090</span>
-					</a>
-					{#if loading}
+						{#if loading}
 						<div class="loader" />
-					{/if}
-				</button>
+						{/if}
+					</button>
+				</a>
 				<button class="publish" on:click={edit_update}>
 					Save changes <span class="material-symbols-outlined">&#xe255</span>
 					{#if loading}
@@ -381,12 +381,17 @@
 		margin-left: auto;
 		margin-top: 20px;
 	}
-	button > a, button > a:hover, button > a:visited, button > a:active {
+	a.publish, a.publish:hover, a.publish:visited, a.publish:active {
 		color: white;
-		text-decoration: none;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		text-decoration: none;
+		margin-top: 20px;
+
+	}
+	a.publish > button {
+		margin: none;
 	}
 	h2 {
 		margin: 0;
@@ -451,7 +456,7 @@
 		cursor: pointer;
 		border-radius: 5px;
 	}
-	button > span, button > a > span {
+	button > span {
 		margin-left: 10px;
 	}
 	button:hover {
