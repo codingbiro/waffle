@@ -10,7 +10,7 @@
 	<a href="/information" class:active={$page.url.pathname === '/information'}>
 		<span class="material-symbols-outlined">&#xe8b8</span> Information
 	</a>
-	<p class="bottom">v0.0.1</p>
+	<p class="bottom">v1.0.0</p>
 </nav>
 
 <article>
