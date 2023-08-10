@@ -14,12 +14,11 @@ const abiPath = 'target/FirmwareUdpdatesAbi.json';
 const networkAddress = 'http://127.0.0.1:' + PORT;
 const deployedContractAddress = 'target/DeployedContractAddress.bin';
 
-
 export default {
-    abiPath,
-    bytecodePath,
-    contractName,
-    contractPath,
-    deployedContractAddress,
-    networkAddress,
+	abiPath,
+	bytecodePath,
+	contractName,
+	contractPath,
+	deployedContractAddress,
+	networkAddress
 };
