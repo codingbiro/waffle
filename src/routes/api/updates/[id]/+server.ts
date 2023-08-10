@@ -1,6 +1,6 @@
 import { error, json, type RequestHandler } from '@sveltejs/kit';
 
-import { web3Helper, web3storageHelper } from '$src/helpers';
+import { web3Helper } from '$src/helpers';
 import { parseParamToNumber, parseUpdate } from '$src/utils';
 import config from '$config/index';
 
@@ -18,7 +18,6 @@ export const GET: RequestHandler = async ({ params }) => {
 		}
 
 		const { defaultAccount, firmwareUpdatesContract } = await web3Helper();
-		const client = web3storageHelper();
 
 		// Parse update from smart contract
 		const update = parseUpdate(
@@ -30,24 +29,10 @@ export const GET: RequestHandler = async ({ params }) => {
 			throw new Error('Invalid udpate');
 		}
 
-		const res = await client.get(update.hash);
-
-		// File not found
-		if (!res) {
-			throw new Error('Invalid file');
-		}
-
-		// Get filename
-		const files = await res.files();
-		const fileName = files?.length ? files[0]?.name ?? '' : '';
-
-		// Filename not found
-		if (!fileName) {
-			throw new Error('Invalid filename');
-		}
-
 		// Contruct file url for download
-		const fileUrl = `https://${update.hash}.ipfs.w3s.link/${fileName}`;
+		const fileUrl = `https://${update.hash}.ipfs.w3s.link/?filename=${
+			update.filename || 'download'
+		}`;
 
 		// Return JSON response with update and fileUrl
 		return json({ ...update, fileUrl });
@@ -67,6 +52,8 @@ export const PUT: RequestHandler = async ({ request, params }) => {
 
 		// Get values from request's formData
 		const values = await request.formData();
+		const filename =
+			typeof values.get('filename') === 'string' ? (values.get('filename') as string) : '';
 		const isEnabled = values.get('isEnabled') === 'true';
 		const isStable = values.get('isStable') === 'true';
 		const name = typeof values.get('name') === 'string' ? (values.get('name') as string) : '';
@@ -74,7 +61,7 @@ export const PUT: RequestHandler = async ({ request, params }) => {
 			typeof values.get('version') === 'string' ? (values.get('version') as string) : '';
 
 		// Validate input
-		if (id < 0 || !name) {
+		if (id < 0 || !name || !version) {
 			throw new Error('Invalid input');
 		}
 
@@ -85,6 +72,7 @@ export const PUT: RequestHandler = async ({ request, params }) => {
 			isEnabled,
 			isStable,
 			name,
+			filename,
 			version
 		};
 

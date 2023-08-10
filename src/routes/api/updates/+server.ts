@@ -59,7 +59,7 @@ async function handleUpload(file: File) {
 	const onRootCidReady = (cid: CIDString) => (localCid = cid);
 
 	// Upload file to Filecoin
-	const serverCid = await client.put([file], { onRootCidReady });
+	const serverCid = await client.put([file], { wrapWithDirectory: false, onRootCidReady });
 
 	// Verify CID from server
 	if (localCid !== serverCid) {
@@ -79,6 +79,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		// Get values from request's formData
 		const values = await request.formData();
 		const file = typeof values.get('file') === 'object' ? (values.get('file') as File) : undefined;
+		const filename =
+			typeof values.get('filename') === 'string' ? (values.get('filename') as string) : '';
 		const isEnabled = values.get('isEnabled') === 'true';
 		const isStable = values.get('isStable') === 'true';
 		const name = typeof values.get('name') === 'string' ? (values.get('name') as string) : '';
@@ -101,6 +103,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			isEnabled,
 			isStable,
 			name,
+			filename,
 			version
 		};
 

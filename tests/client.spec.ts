@@ -4,14 +4,17 @@ import { info } from 'console';
 const random = Math.floor(Math.random() * 100000); // avoid version collision
 
 test('Performance - small', async ({ page }) => {
+	const filename = '2.zip';
+
 	await page.goto('http://localhost:5249/dashboard');
 	await page.getByTestId('createbutton').click();
 	await expect(page.getByTestId('createmodal')).toBeVisible();
 
-	await page.getByPlaceholder('Firmware').fill('RouterOS');
+	await page.getByPlaceholder('Firmware').fill('EdgeOS');
 	await page.getByPlaceholder('Version').fill('1.0.0-small' + random);
+	await page.getByTestId('filename').fill(filename);
 	await page.getByTestId('isenabled').check();
-	await page.getByTestId('firmware').setInputFiles('tests/files/small.bin');
+	await page.getByTestId('firmware').setInputFiles('tests/files/' + filename);
 
 	let start = performance.now();
 
@@ -24,7 +27,7 @@ test('Performance - small', async ({ page }) => {
 	await expect(page.getByTestId('createmodal')).toBeHidden();
 
 	let end = performance.now() - start;
-	info("Upload speed (ms): " + end);
+	info('Upload speed (ms): ' + end);
 
 	responsePromise = page.waitForResponse(
 		(response) =>
@@ -41,18 +44,20 @@ test('Performance - small', async ({ page }) => {
 	await download.path();
 	end = performance.now() - start;
 
-	info("Download speed (ms): " + end);
+	info('Download speed (ms): ' + end);
 });
 
 test('Performance - medium', async ({ page }) => {
+	const filename = '10.zip';
 	await page.goto('http://localhost:5249/dashboard');
 	await page.getByTestId('createbutton').click();
 	await expect(page.getByTestId('createmodal')).toBeVisible();
 
-	await page.getByPlaceholder('Firmware').fill('RouterOS');
+	await page.getByPlaceholder('Firmware').fill('EdgeOS');
 	await page.getByPlaceholder('Version').fill('1.0.0-medium' + random);
 	await page.getByTestId('isenabled').check();
-	await page.getByTestId('firmware').setInputFiles('tests/files/medium.bin');
+	await page.getByTestId('filename').fill(filename);
+	await page.getByTestId('firmware').setInputFiles('tests/files/' + filename);
 
 	let start = performance.now();
 
@@ -65,7 +70,7 @@ test('Performance - medium', async ({ page }) => {
 	await expect(page.getByTestId('createmodal')).toBeHidden();
 
 	let end = performance.now() - start;
-	info("Upload speed (ms): " + end);
+	info('Upload speed (ms): ' + end);
 
 	responsePromise = page.waitForResponse(
 		(response) =>
@@ -82,18 +87,21 @@ test('Performance - medium', async ({ page }) => {
 	await download.path();
 	end = performance.now() - start;
 
-	info("Download speed (ms): " + end);
+	info('Download speed (ms): ' + end);
 });
 
 test('Performance - large', async ({ page }) => {
+	const filename = '100.zip';
+
 	await page.goto('http://localhost:5249/dashboard');
 	await page.getByTestId('createbutton').click();
 	await expect(page.getByTestId('createmodal')).toBeVisible();
 
-	await page.getByPlaceholder('Firmware').fill('RouterOS');
+	await page.getByPlaceholder('Firmware').fill('EdgeOS');
 	await page.getByPlaceholder('Version').fill('1.0.0-large' + random);
+	await page.getByTestId('filename').fill(filename);
 	await page.getByTestId('isenabled').check();
-	await page.getByTestId('firmware').setInputFiles('tests/files/large.bin');
+	await page.getByTestId('firmware').setInputFiles('tests/files/' + filename);
 
 	let start = performance.now();
 
@@ -106,7 +114,7 @@ test('Performance - large', async ({ page }) => {
 	await expect(page.getByTestId('createmodal')).toBeHidden();
 
 	let end = performance.now() - start;
-	info("Upload speed (ms): " + end);
+	info('Upload speed (ms): ' + end);
 
 	responsePromise = page.waitForResponse(
 		(response) =>
@@ -123,5 +131,5 @@ test('Performance - large', async ({ page }) => {
 	await download.path();
 	end = performance.now() - start;
 
-	info("Download speed (ms): " + end);
+	info('Download speed (ms): ' + end);
 });

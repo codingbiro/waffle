@@ -9,7 +9,7 @@
 	let create_visible = false;
 	
 	/** @type {import('$src/types/firmware').NewFirmware} */
-	let new_item = { isEnabled: false, isStable: false, name: '', version: '' };
+	let new_item = { isEnabled: false, isStable: false, name: '', version: '', filename: '' };
 
 	/** @type {import('src/types/firmware').EditFirmware | null} */
 	let edit_item = null;
@@ -47,6 +47,7 @@
 		input.append('isEnabled', new_item.isEnabled.toString());
 		input.append('isStable', new_item.isStable.toString());
 		input.append('name', new_item.name);
+		input.append('filename', new_item.filename);
 		input.append('version', new_item.version);
 
 		loading = true;
@@ -59,7 +60,7 @@
 			error = 'create';
 		} else {
 			create_visible = false;
-			new_item = { isEnabled: false, isStable: false, name: '', version: '' };
+			new_item = { isEnabled: false, isStable: false, name: '', version: '', filename: '' };
 			invalidateAll();
 		}
 	}
@@ -75,6 +76,7 @@
 		input.append('isEnabled', edit_item.isEnabled.toString());
 		input.append('isStable', edit_item.isStable.toString());
 		input.append('name', edit_item.name);
+		input.append('filename', edit_item.filename);
 		input.append('version', edit_item.version);
 
 		loading = true;
@@ -129,6 +131,10 @@
 				<input class="string" bind:value={new_item.version} placeholder="Version" />
 			</div>
 			<div>
+				<p>File name</p>
+				<input class="string" bind:value={new_item.filename} placeholder="" data-testid="filename" />
+			</div>
+			<div>
 				<p>Set as enabled</p>
 				<label class="switch" data-testid="isenabled">
 					<input type="checkbox" bind:checked={new_item.isEnabled} />
@@ -169,23 +175,27 @@
 		<div on:click|stopPropagation role="presentation">
 			<h2>Edit Firmware Update</h2>
 			<div>
-				<p>id</p>
+				<p>Id</p>
 				<input class="string" value={edit_item.id} disabled />
 			</div>
 			<div>
-				<p>name</p>
+				<p>Name</p>
 				<input class="string full" bind:value={edit_item.name} />
 			</div>
 			<div>
-				<p>version</p>
+				<p>Version</p>
 				<input class="string full" bind:value={edit_item.version} />
 			</div>
 			<div>
-				<p>uploader</p>
+				<p>File name</p>
+				<input class="string full" bind:value={edit_item.version} />
+			</div>
+			<div>
+				<p>Uploader</p>
 				<input class="string full" value={edit_item.uploader} disabled />
 			</div>
 			<div>
-				<p>hash</p>
+				<p>CID</p>
 				<input class="string full" value={edit_item.hash} disabled />
 			</div>
 			<div>
@@ -246,8 +256,8 @@
 		<th>Timestamp</th>
 	</tr>
 	{#if data?.updates?.length}
-		{#each data.updates as { id, version, uploader, hash, isEnabled, isStable, timestamp, name }}
-			<tr on:click={() => void showhide_edit({ id, version, uploader, hash, isEnabled, isStable, timestamp, name })}>
+		{#each data.updates as { id, version, uploader, hash, isEnabled, isStable, timestamp, name, filename }}
+			<tr on:click={() => void showhide_edit({ id, version, uploader, hash, isEnabled, isStable, timestamp, name, filename })}>
 				<td>{id}</td>
 				<td>{name}</td>
 				<td>{version}</td>

@@ -13,6 +13,7 @@ export default function parseUpdate(
 		typeof input.uploader === 'string' &&
 		typeof input.hash === 'string' &&
 		typeof input.name === 'string' &&
+		typeof input.filename === 'string' &&
 		typeof input.isEnabled === 'boolean' &&
 		typeof input.isStable === 'boolean' &&
 		typeof input.timestamp === 'bigint'
@@ -24,6 +25,7 @@ export default function parseUpdate(
 					uploader: input.uploader,
 					hash: input.hash,
 					name: input.name,
+					filename: input.filename,
 					isEnabled: input.isEnabled,
 					isStable: input.isStable,
 					timestamp: Number(input.timestamp)
