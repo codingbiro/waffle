@@ -13,6 +13,8 @@ artifacts
 cache
 config/*
 !config/index.ts
+tests/files/*
+!tests/files/*.zip
 
 # Logs
 logs
