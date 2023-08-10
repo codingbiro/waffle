@@ -1,18 +1,18 @@
 # Custom
-target/*
+scripts/target/*
 upload.zip
 *.txt
 !satoshi.txt
 .DS_Store
-client/build
-client/.svelte-kit
-client/package
+build
+.svelte-kit
+package
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 artifacts
 cache
-client/config/*
-!client/config/index.ts
+config/*
+!config/index.ts
 
 # Logs
 logs

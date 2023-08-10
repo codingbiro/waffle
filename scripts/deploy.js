@@ -1,23 +1,30 @@
-const { Web3 } = require('web3');
-const fs = require('fs');
-const path = require('path');
-const { info, trace } = require('console');
+import { Web3 } from 'web3';
+import { readFileSync, writeFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { info, trace } from 'console';
+import { fileURLToPath } from 'url';
 
-const config = require('./config');
-const abiPathJoin = path.join(__dirname, config.abiPath);
-const abi = require(abiPathJoin);
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+import config from './config.js';
+const { abiPath, networkAddress, bytecodePath, deployedContractAddress } = config;
+
+const abiPathJoin = join(__dirname, abiPath);
 
 async function deploy() {
     try {
+        // Load in ABI
+        const { default: abi } = await import(abiPathJoin, { assert: { type: 'json' } });
+
         // Set up a connection to the Ethereum network
-        const web3 = new Web3(new Web3.providers.HttpProvider(config.networkAddress));
+        const web3 = new Web3(new Web3.providers.HttpProvider(networkAddress));
         web3.eth.Contract.handleRevert = true;
         const providersAccounts = await web3.eth.getAccounts();
         const defaultAccount = providersAccounts[0];
         
         // Read the bytecode from the file system
-        const bytecodePathJoin = path.join(__dirname, config.bytecodePath);
-        const bytecode = fs.readFileSync(bytecodePathJoin, 'utf8');
+        const bytecodePathJoin = join(__dirname, bytecodePath);
+        const bytecode = readFileSync(bytecodePathJoin, 'utf8');
         
         // Create a new contract object using the ABI and bytecode
         const FirmwareUpdatesContract = new web3.eth.Contract(abi);
@@ -40,8 +47,8 @@ async function deploy() {
         });
 
         // Write the Contract address to a new file
-        const deployedAddressPath = path.join(__dirname, config.deployedContractAddress);
-        fs.writeFileSync(deployedAddressPath, tx.options.address);
+        const deployedAddressPath = join(__dirname, deployedContractAddress);
+        writeFileSync(deployedAddressPath, tx.options.address);
         info('DeploymentSuccess' + ' (deployer account:', defaultAccount + ')');
     } catch (err) {
         trace(err);
