@@ -117,20 +117,20 @@
 </svelte:head>
 
 {#if create_visible}
-	<div class="modal" on:click={showhide_create(false)} role="presentation">
+	<div class="modal" on:click={showhide_create(false)} role="presentation" data-testid="createmodal">
 		<div on:click|stopPropagation role="presentation">
 			<h2>Publish a Firmware Update</h2>
 			<div>
 				<p>Name of the firmware</p>
-				<input class="string" bind:value={new_item.name} />
+				<input class="string" bind:value={new_item.name} placeholder="Firmware" />
 			</div>
 			<div>
 				<p>Version name</p>
-				<input class="string" bind:value={new_item.version} />
+				<input class="string" bind:value={new_item.version} placeholder="Version" />
 			</div>
 			<div>
 				<p>Set as enabled</p>
-				<label class="switch">
+				<label class="switch" data-testid="isenabled">
 					<input type="checkbox" bind:checked={new_item.isEnabled} />
 					<span class="slider" />
 				</label>
@@ -144,12 +144,12 @@
 			</div>
 			<div class="file">
 				<p>Upload the firmware</p>
-				<input bind:files id="firmware" name="firmware" type="file" />
+				<input bind:files id="firmware" name="firmware" type="file" data-testid="firmware" />
 			</div>
 			<button class="close" on:click={showhide_create(false)}>
 				<span class="material-symbols-outlined">&#xe5cd</span>
 			</button>
-			<button class="publish" on:click={create_update}>
+			<button class="publish" on:click={create_update} data-testid="publish">
 				Publish Update <span class="material-symbols-outlined">&#xe255</span>
 				{#if loading}
 					<div class="loader" />
@@ -230,7 +230,7 @@
 <h1>Dashboard</h1>
 <div class="top-section">
 	<p>Total count of updates: {data?.updates?.length || 0}</p>
-	<button class="create" on:click={showhide_create()}>
+	<button class="create" on:click={showhide_create()} data-testid="createbutton">
 		Create Update <span class="material-symbols-outlined">&#xe2c3</span>
 	</button>
 </div>
@@ -284,7 +284,7 @@
 {/if}
 <style>
 	#abs-loader {
-		position: absolute;
+		position: fixed;
 		right: 20px;
 		bottom: 20px;
 	}
@@ -405,7 +405,7 @@
 	.modal {
 		z-index: 10;
 		inset: 0;
-		position: absolute;
+		position: fixed;
 		display: flex;
 		justify-content: center;
 		align-items: center;
