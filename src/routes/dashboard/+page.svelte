@@ -188,7 +188,7 @@
 			</div>
 			<div>
 				<p>File name</p>
-				<input class="string full" bind:value={edit_item.version} />
+				<input class="string full" bind:value={edit_item.filename} />
 			</div>
 			<div>
 				<p>Uploader</p>
