@@ -21,7 +21,7 @@ contract FirmwareUpdates
         uint256 timestamp; // time of the creation of the update
         address uploader; // uploader of the firmware
         string version; // version of the firmware
-        string filename; // preffered filename
+        string filename; // preferred filename
     }
     
     // Input struct for creating an update
@@ -32,7 +32,7 @@ contract FirmwareUpdates
         bool isStable; // whether the firmware is a stable release
         string name; // name of the firmware
         string version; // version of the firmware
-        string filename; // preffered filename
+        string filename; // preferred filename
     }
     
     // Input struct for editing an update
@@ -42,7 +42,7 @@ contract FirmwareUpdates
         bool isStable; // whether the firmware is a stable release
         string name; // name of the firmware
         string version; // version of the firmware
-        string filename; // preffered filename
+        string filename; // preferred filename
     }
 
     Update[] private firmwareUpdates; // Firmware updates
