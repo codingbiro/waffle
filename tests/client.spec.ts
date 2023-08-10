@@ -25,66 +25,65 @@ const APP_ROOT = 'http://localhost:5249';
 
 // Loops through all Test 2 cases
 for (const file of test2Files) {
-  // Tests a case
-  test('Performance testing: ' + file, async ({ page }) => {
-	// Random version to avoid version collision
-	const version = Math.floor(Math.random() * 100000) + file.substring(0, 5);
+	// Tests a case
+	test('Performance testing: ' + file, async ({ page }) => {
+		// Random version to avoid version collision
+		const version = Math.floor(Math.random() * 100000) + file.substring(0, 5);
 
-	// Navigate to dashboard and open createmodal
-	await page.goto(`${APP_ROOT}/dashboard`);
-	await page.getByTestId('createbutton').click();
-	await expect(page.getByTestId('createmodal')).toBeVisible();
+		// Navigate to dashboard and open createmodal
+		await page.goto(`${APP_ROOT}/dashboard`);
+		await page.getByTestId('createbutton').click();
+		await expect(page.getByTestId('createmodal')).toBeVisible();
 
-	// Fill out createmodal form
-	await page.getByPlaceholder('Firmware').fill('Unify TestOS');
-	await page.getByPlaceholder('Version').fill(version);
-	await page.getByTestId('filename').fill(file);
-	await page.getByTestId('isenabled').check();
-	await page.getByTestId('firmware').setInputFiles('tests/files/' +  file);
+		// Fill out createmodal form
+		await page.getByPlaceholder('Firmware').fill('Unify TestOS');
+		await page.getByPlaceholder('Version').fill(version);
+		await page.getByTestId('filename').fill(file);
+		await page.getByTestId('isenabled').check();
+		await page.getByTestId('firmware').setInputFiles('tests/files/' + file);
 
-	// Start timer1
-	const start1 = performance.now();
+		// Start timer1
+		const start1 = performance.now();
 
-	// Promise for awaiting API request for creating the firmware is resolved
-	let responsePromise = page.waitForResponse(
-		(response) =>
-			response.url() === `${APP_ROOT}/api/updates` && response.status() === 201
-	);
-	// Submit form
-	await page.getByTestId('publish').click();
-	// Await Promise after submitting
-	await responsePromise;
-	// Modal should be closed after promise is resolved
-	await expect(page.getByTestId('createmodal')).toBeHidden();
+		// Promise for awaiting API request for creating the firmware is resolved
+		let responsePromise = page.waitForResponse(
+			(response) => response.url() === `${APP_ROOT}/api/updates` && response.status() === 201
+		);
+		// Submit form
+		await page.getByTestId('publish').click();
+		// Await Promise after submitting
+		await responsePromise;
+		// Modal should be closed after promise is resolved
+		await expect(page.getByTestId('createmodal')).toBeHidden();
 
-	// End timer1
-	const end1 = performance.now() - start1;
-	info('Upload speed (ms): ' + end1);
+		// End timer1
+		const end1 = performance.now() - start1;
+		info('Upload speed (ms): ' + end1);
 
-	// Promise for awaiting API request for querying the update
-	responsePromise = page.waitForResponse(
-		(response) =>
-			response.url().startsWith(`${APP_ROOT}/api/updates/`) && response.status() === 200
-	);
-	// Click the update in the table
-	await page.getByText(version).click();
-	// Await Promise after clicking
-	await responsePromise;
+		// Promise for awaiting API request for querying the update
+		responsePromise = page.waitForResponse(
+			(response) =>
+				response.url().startsWith(`${APP_ROOT}/api/updates/`) && response.status() === 200
+		);
+		// Click the update in the table
+		await page.getByText(version).click();
+		// Await Promise after clicking
+		await responsePromise;
 
-	// Start timer2
-	const start2 = performance.now();
+		// Start timer2
+		const start2 = performance.now();
 
-	// Promise for download event
-	const downloadPromise = page.waitForEvent('download');
-	// Start download
-	await page.getByTestId('download').click();
-	// Await Promise for download
-	const download = await downloadPromise;
-	// Await download.path to finish = download done
-	await download.path();
+		// Promise for download event
+		const downloadPromise = page.waitForEvent('download');
+		// Start download
+		await page.getByTestId('download').click();
+		// Await Promise for download
+		const download = await downloadPromise;
+		// Await download.path to finish = download done
+		await download.path();
 
-	// End timer2
-	const end2 = performance.now() - start2;
-	info('Download speed (ms): ' + end2);
-  });
+		// End timer2
+		const end2 = performance.now() - start2;
+		info('Download speed (ms): ' + end2);
+	});
 }
