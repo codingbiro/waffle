@@ -203,7 +203,7 @@
 				</label>
 			</div>
 			<div>
-				<a class="publish" href={edit_item.url} download target="_blank">
+				<a class="publish" href={edit_item.url} download target="_blank" data-testid="download">
 					<button class="publish" style="margin:auto auto 0 0">
 						Download <span class="material-symbols-outlined">&#xf090</span>
 						{#if loading}
