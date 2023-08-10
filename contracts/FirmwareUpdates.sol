@@ -21,6 +21,7 @@ contract FirmwareUpdates
         uint256 timestamp; // time of the creation of the update
         address uploader; // uploader of the firmware
         string version; // version of the firmware
+        string filename; // preffered filename
     }
     
     // Input struct for creating an update
@@ -31,6 +32,7 @@ contract FirmwareUpdates
         bool isStable; // whether the firmware is a stable release
         string name; // name of the firmware
         string version; // version of the firmware
+        string filename; // preffered filename
     }
     
     // Input struct for editing an update
@@ -40,6 +42,7 @@ contract FirmwareUpdates
         bool isStable; // whether the firmware is a stable release
         string name; // name of the firmware
         string version; // version of the firmware
+        string filename; // preffered filename
     }
 
     Update[] private firmwareUpdates; // Firmware updates
@@ -264,6 +267,7 @@ contract FirmwareUpdates
                 uploader: msg.sender,
                 hash: update.hash, // CID
                 name: update.name,
+                filename: update.filename,
                 isEnabled: update.isEnabled,
                 isStable: update.isStable,
                 // solhint-disable-next-line not-rely-on-time
@@ -289,6 +293,7 @@ contract FirmwareUpdates
                 firmwareUpdates[p].isEnabled = newValues.isEnabled;
                 firmwareUpdates[p].isStable = newValues.isStable;
                 firmwareUpdates[p].name = newValues.name;
+                firmwareUpdates[p].filename = newValues.filename;
                 firmwareUpdates[p].version = newValues.version;
                 return firmwareUpdates[p];
             }
