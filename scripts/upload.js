@@ -1,6 +1,8 @@
-const { info, trace } = require('console');
-require('dotenv').config()
-const { Web3Storage, getFilesFromPath } = require('web3.storage');
+import { Web3Storage, getFilesFromPath } from 'web3.storage';
+import { info, trace } from 'console';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Upload data to w3s
 async function handleUpload(filepath) {
@@ -12,8 +14,8 @@ async function handleUpload(filepath) {
     info('CID', rootCid);
 
     // Get info on the Filecoin deals that the CID is stored in
-    const info = await client.status(rootCid);
-    info('info', info);
+    const statusInfo = await client.status(rootCid);
+    info('info', statusInfo);
 
     // Fetch and verify files from web3.storage
     const res = await client.get(rootCid);
