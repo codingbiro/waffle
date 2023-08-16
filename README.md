@@ -1,63 +1,24 @@
-TODO: Refactor / Update
-
 # Waffle
 
-A Secure Firmware Dispatch System for IoT Devices using Blockchain - a MSC Thesis project by Vince Biro at the Technical University of Denmark.
+A Secure Firmware Dispatch System for IoT Devices using Blockchain - a MSc Thesis project by Vince Biro at the Technical University of Denmark. For more details of the project and the proposed solution, please refer to the [Thesis details](#Thesis-details) section.
 
-## Project information
+#### Usage
 
-- Requires Node v18 with npx and yarn. Make sure you run `yarn` to install dependencies in the root folder and in `./client`
-
-- To start an Ethereum development network with Hardhat, run `yarn network:start`
-  ⚠️ If you use your own network, make sure the configuration files (`config.js` and `client/config/*`) are set up accordingly.
-- `config.js`: Project's core configuration location.
-
-- `config:init`: Initializes the project config from Hardhat's output.
-
-- `yarn contract:deploy`: Deploys the smart contract.
-
-- `yarn contract:test`: Tests the deployment.
-
-- `yarn upload:test`: Tests the upload to Filecoin using web3-storage.
-
+- Requires Node v18 with npx and yarn. Make sure you run `yarn` to install dependencies, and set your ENV in `.env`.
+- `yarn start`: Starts network, deploys smart contract, initalizes and starts client.
+-  ⚠️ If you wish to use your own network, make sure the configuration file `config/index.ts` is set up accordingly.
 - `yarn client:init`: This initializes client (copies required configs).
-
-- `yarn client:start`: This starts the Svelte client in ./client.
-
-- `yarn start`: One command to run all the above: starts network, initializes configuration files, compiles and deploys the smart contract and starts the client.
-
 - `yarn solhint`: Runs Solidity linting for smart contracts.
+- `yarn format`: Runs Prettier.
+- `yarn lint`: Runs ESLint.
+- `yarn test:upload`: Tests the upload to Filecoin using web3-storage.
+- `yarn test:client`: Runs Playwright e2e tests.
 
-## Client-only usage
-
-- Update `./client/config/*` with the required configuration.
-- Then run `yarn client:start`.
-- For more information on how to run Svelte, read `./client/README.md`.
-
-### Notes
-
-- Use node version `18` for best compatibility [(GitHub Issue)](https://github.com/web3-storage/web3.storage/issues/2274).
-
-# create-svelte
-
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
+### Client usage
+The client is built with Svelte.
+#### Initialize client
+Update `./config/index.ts` with your desired configuration.
+#### Development 
 ```bash
 npm run dev
 
@@ -65,7 +26,7 @@ npm run dev
 npm run dev -- --open
 ```
 
-## Building
+#### Building
 
 To create a production version of your app:
 
@@ -76,3 +37,18 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+
+## Thesis details
+
+Full paper available on request - hello(at)birovince(dot)com.
+
+### Proposed architecture
+![Proposed architecture](Arch.png "Proposed architecture")
+
+### Abstract
+
+Internet-­of-­Things (IoT) devices have become a prevalent part of everyday life. Consequently, the need for IoT firmware security is greater than ever. Firmware dispatch systems play a crucial role in maintaining the secure operations of IoT devices. Therefore, it is essential to have robust solutions for such systems.
+
+With the advent of blockchain and Web3 technologies, there are new ways of tackling security­related challenges. Blockchain provides a tamper­proof, secure, and distributed protocol, making it an excellent choice for firmware dispatch systems. This thesis explores the existing blockchain­based solutions for distributing IoT firmware updates. Furthermore, it proposes a secure firmware dispatch system for IoT devices using Ethereum. The system employs Web3.Storage, a hosted implementation of the InterPlanetary File System, a peer­to­peer hypermedia protocol. The proposed architecture is a fast, reliable, and scalable system that offers a protocol for validation of firmware integrity. It can benefit a wide range of manufacturers who intend to increase the security of their IoT devices.
+
+Additionally, this work introduces a client application of the aforementioned architecture. It presents the implementation steps in detail and assesses the related technologies. Finally, it analyses the system from a security and performance perspective.
