@@ -1,6 +1,6 @@
 # Waffle
 
-A Secure Firmware Dispatch System for IoT Devices using Blockchain - a MSc Thesis project by Vince Biro at the Technical University of Denmark. For more details of the project and the proposed solution, please refer to the [Thesis details](#Thesis-details) section.
+A Secure Firmware Dispatch System for IoT Devices using Blockchain - a MSc Thesis project by Vince Biro at the Technical University of Denmark. For more details of the project and the proposed solution, please refer to the [Thesis details](#thesis-details) section.
 
 #### Usage
 
@@ -37,6 +37,39 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+
+## API
+
+|Path|Method|Input type|Description|
+|---|---|---|---|
+|`/updates`|GET||Returns all firmware updates|
+|`/updates`|POST|CreateUpdateInput|Creates a new firmware update|
+|`/updates/[id]`|GET||Returns a firmware update and its download URL|
+|`/updates/[id]`|PUT|EditUpdateInput|Edits an update and returns the new object|
+|`/information`|GET||Returns all system information|
+
+### Types
+##### CreateUpdateInput
+```
+{
+    filename: string;
+    hash: string;
+    isEnabled: boolean;
+    isStable: boolean;
+    name: string;
+    version: string;
+}
+```
+##### EditUpdateInput
+```
+{
+    filename: string;
+    isEnabled: boolean;
+    isStable: boolean;
+    name: string;
+    version: string;
+}
+```
 
 ## Thesis details
 
