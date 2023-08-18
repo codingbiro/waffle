@@ -47,7 +47,7 @@ function run() {
 		// Write the Contract ABI to a new file
 		const abiPathJoin = join(__dirname, abiPath);
 		writeFileSync(abiPathJoin, JSON.stringify(abi, null, '\t'));
-		info('CompilationSuccess');
+		info('Contract compiled successfully');
 	} catch (err) {
 		trace(err);
 	}

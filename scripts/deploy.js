@@ -49,7 +49,7 @@ async function deploy() {
 		// Write the Contract address to a new file
 		const deployedAddressPath = join(__dirname, deployedContractAddress);
 		writeFileSync(deployedAddressPath, tx.options.address);
-		info('DeploymentSuccess' + ' (deployer account:', defaultAccount + ')');
+		info('Contract deployed successfully at ' + tx.options.address + ' (deployer account:', defaultAccount + ')');
 	} catch (err) {
 		trace(err);
 	}

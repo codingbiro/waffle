@@ -14,9 +14,9 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier . --write .",
 		"network:start": "mkdir -p scripts/target && npx hardhat node > scripts/target/network.init",
-		"config:init": "awk 'NR==1 {print substr($0,64,4); exit}' scripts/target/network.init > scripts/target/PORT",
+		"config:init": "awk 'NR==1 {print substr($0,64,4); exit}' scripts/target/network.init > scripts/target/PORT && echo 'Configuration initialized'",
 		"contract:deploy": "node scripts/compile.js && NODE_NO_WARNINGS=1 node scripts/deploy.js",
-		"client:init": "cp scripts/target/PORT config && cp scripts/target/DeployedContractAddress.bin config && echo 'const abi = (' > config/FirmwareUdpdatesAbi.ts && cat scripts/target/FirmwareUdpdatesAbi.json >> config/FirmwareUdpdatesAbi.ts && echo ') as const; export default abi;' >> config/FirmwareUdpdatesAbi.ts",
+		"client:init": "cp scripts/target/PORT config && cp scripts/target/DeployedContractAddress.bin config && echo 'const abi = (' > config/FirmwareUdpdatesAbi.ts && cat scripts/target/FirmwareUdpdatesAbi.json >> config/FirmwareUdpdatesAbi.ts && echo ') as const; export default abi;' >> config/FirmwareUdpdatesAbi.ts && echo 'Client initialized'",
 		"test:upload": "node scripts/upload.js upload satoshi.txt",
 		"solhint": "solhint 'contracts/*.sol'",
 		"test:client": "yarn playwright test"
